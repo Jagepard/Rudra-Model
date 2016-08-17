@@ -1,11 +1,11 @@
 {
-    "name"        : "rudra/container",
+    "name"        : "rudra/model",
     "description" : "The Rudra framework",
-    "version"     : "1.0.1–stable",
+    "version"     : "1.0.0–stable",
     "type"        : "library",
     "keywords"    : [
         "rudra",
-        "container"
+        "model"
     ],
     "license"     : "MIT",
     "authors"     : [
