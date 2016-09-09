@@ -35,4 +35,12 @@ class Model
     {
         $this->di = $di;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getDi()
+    {
+        return $this->di;
+    }
 }
