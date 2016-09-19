@@ -11,8 +11,6 @@
 
 namespace Rudra;
 
-use Rudra\IContainer;
-
 /**
  * Class Model
  * @package Rudra
