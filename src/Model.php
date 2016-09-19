@@ -1,14 +1,17 @@
 <?php
 
+/**
+ * Date: 17.08.2016
+ * Time: 14:50
+ * 
+ * @author    : Korotkov Danila <dankorot@gmail.com>
+ * @copyright Copyright (c) 2016, Korotkov Danila
+ * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
+ */
+
 namespace Rudra;
 
-    /**
-     * Date: 17.08.2016
-     * Time: 14:50
-     * @author    : Korotkov Danila <dankorot@gmail.com>
-     * @copyright Copyright (c) 2016, Korotkov Danila
-     * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
-     */
+use Rudra\IContainer;
 
 /**
  * Class Model
@@ -29,9 +32,9 @@ class Model
 
     /**
      * Model constructor.
-     * @param iContainer $di
+     * @param IContainer $di
      */
-    public function __construct(iContainer $di)
+    public function __construct(IContainer $di)
     {
         $this->di = $di;
     }
