@@ -11,45 +11,45 @@
 
 namespace Rudra;
 
-use App\Config\Config;
+use App\Config;
 
 /**
  * Class Model
+ *
  * @package Rudra
  */
 class Model
 {
-    /**
-     * @var
-     * Для экземпляра класса валидации
-     */
-    protected $v;
 
     /**
      * @var
      */
-    protected $di;
+    protected $container;
 
     /**
      * @var
      */
     protected $data;
 
+
     /**
      * Model constructor.
-     * @param IContainer $di
+     *
+     * @param \Rudra\IContainer $container
      */
-    public function __construct(IContainer $di)
+    public function __construct(IContainer $container)
     {
-        $this->di = $di;
+        $this->container = $container;
+//        Container::$app->get('debugbar')['time']->stopMeasure('Controller');
+//        Container::$app->get('debugbar')['time']->startMeasure('Model', __CLASS__);
     }
 
     /**
      * @return mixed
      */
-    public function getDi()
+    public function container()
     {
-        return $this->di;
+        return $this->container;
     }
 
     /**
@@ -82,22 +82,24 @@ class Model
      */
     public function redirect($value)
     {
-        $this->getDi()->get('redirect')->run($value);
+        $this->container()->get('redirect')->run($value);
     }
 
     /**
      * @param $key
+     *
+     * @return string
      */
     public function fileUpload($key)
     {
-        if ($this->getDi()->isUploaded($key)) {
-            $uploadedFile = '/uploaded/' . substr(md5(microtime()), 0, 5) . $this->getDi()->getUpload($key, 'name');
+        if ($this->container()->isUploaded($key)) {
+            $uploadedFile = '/uploaded/' . substr(md5(microtime()), 0, 5) . $this->container()->getUpload($key, 'name');
             $uploadPath   = Config::PUBLIC_PATH . $uploadedFile;
-            $this->setDataItem($key, APP_URL . $uploadedFile);
-            move_uploaded_file($this->getDi()->getUpload($key, 'tmp_name'), $uploadPath);
-        } else {
-            $this->setDataItem($key, $this->getDi()->getPost($key));
-        }
-    }
+            move_uploaded_file($this->container()->getUpload($key, 'tmp_name'), $uploadPath);
 
+            return APP_URL . $uploadedFile;
+        }
+
+        return $this->container()->getPost($key);
+    }
 }
