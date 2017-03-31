@@ -3,6 +3,3 @@
 /tests/
 /.idea/
 /composer.lock
-/src/index.php
-/nbproject/
-/nbproject/private/
