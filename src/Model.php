@@ -1,17 +1,12 @@
 <?php
 
-/**
- * Date: 17.08.2016
- * Time: 14:50
- *
- * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2016, Korotkov Danila
- * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
- */
+declare(strict_types = 1);
 
 namespace Rudra;
 
+
 use App\Config;
+
 
 /**
  * Class Model
@@ -21,16 +16,12 @@ use App\Config;
 class Model
 {
 
+    use ContainerTrait, DataTrait;
+
     /**
      * @var
      */
     protected $container;
-
-    /**
-     * @var
-     */
-    protected $data;
-
 
     /**
      * Model constructor.
@@ -50,39 +41,6 @@ class Model
     public function container()
     {
         return $this->container;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * @param mixed $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
-
-    /**
-     * @param $key
-     * @param $data
-     */
-    public function setDataItem($key, $data)
-    {
-        $this->data[$key] = $data;
-    }
-
-    /**
-     * @param $value
-     */
-    public function redirect($value)
-    {
-        $this->container()->get('redirect')->run($value);
     }
 
     /**
