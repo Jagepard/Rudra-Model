@@ -1,7 +1,6 @@
 {
     "name"        : "rudra/model",
     "description" : "The Rudra framework",
-    "version"     : "dev-master",
     "type"        : "library",
     "keywords"    : [
         "rudra",
