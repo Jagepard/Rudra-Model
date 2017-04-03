@@ -21,17 +21,21 @@
         "skype": "jagepard.ru"
     },
     "require"     : {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "rudra/container": "1.*",
+        "rudra/controller": "1.*"
     },
     "require-dev" : {
-        "satooshi/php-coveralls": "dev-master",
-        "rudra/container": "dev-master",
-        "rudra/controller": "dev-master"
+        "satooshi/php-coveralls": "dev-master"
+
     },
     "autoload"    : {
         "psr-4": {
             "Rudra\\": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config"            : {
+        "optimize-autoloader" : true
+    }
 }
