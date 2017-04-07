@@ -3,3 +3,4 @@
 /tests/
 /.idea/
 /composer.lock
+/src/tests/build/
