@@ -38,7 +38,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testContainer()
     {
-        $this->assertInstanceOf(ContainerInterface::class,$this->model()->container());
+        $this->assertInstanceOf(ContainerInterface::class, $this->model()->container());
     }
 
     /**
