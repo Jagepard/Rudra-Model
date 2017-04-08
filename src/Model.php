@@ -22,9 +22,9 @@ class Model
     /**
      * Model constructor.
      *
-     * @param \Rudra\IContainer $container
+     * @param \Rudra\ContainerInterface $container
      */
-    public function __construct(IContainer $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -32,7 +32,7 @@ class Model
     /**
      * @return mixed
      */
-    public function container()
+    public function container(): ContainerInterface
     {
         return $this->container;
     }

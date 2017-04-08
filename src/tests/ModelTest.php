@@ -15,7 +15,7 @@ declare(strict_types = 1);
 
 
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
-use Rudra\IContainer;
+use Rudra\ContainerInterface;
 use Rudra\Container;
 use Rudra\Model;
 
@@ -38,7 +38,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testContainer()
     {
-        $this->assertInstanceOf(IContainer::class,$this->model()->container());
+        $this->assertInstanceOf(ContainerInterface::class,$this->model()->container());
     }
 
     /**
