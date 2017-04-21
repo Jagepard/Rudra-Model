@@ -6,4 +6,6 @@
 [![Latest Stable Version](https://poser.pugx.org/rudra/validation/v/stable)](https://packagist.org/packages/rudra/model)
 [![Total Downloads](https://poser.pugx.org/rudra/validation/downloads)](https://packagist.org/packages/rudra/model)
 [![License](https://poser.pugx.org/rudra/validation/license)](https://packagist.org/packages/rudra/model)
+
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/b67b26a9-5cca-4047-9ed9-329554573795/big.png)](https://insight.sensiolabs.com/projects/b67b26a9-5cca-4047-9ed9-329554573795)
 # Rudra-Model
