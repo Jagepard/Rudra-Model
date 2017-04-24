@@ -13,6 +13,6 @@ class Model
 {
 
     use ContainerTrait;
-    use DataTrait;
+    use ControllerTrait;
     use SetContainerTrait;
 }
