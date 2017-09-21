@@ -22,7 +22,8 @@
     "require"           : {
         "php"              : ">=7.1",
         "rudra/container"  : "self.version",
-        "rudra/controller" : "self.version"
+        "rudra/controller" : "self.version",
+        "maximebf/debugbar" : "1.*"
     },
     "require-dev"       : {
         "satooshi/php-coveralls" : "dev-master"

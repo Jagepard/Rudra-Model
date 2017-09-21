@@ -33,7 +33,10 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     protected function setUp(): void
     {
-        $this->model = new Model(Container::app());
+        Container::app();
+        Container::$app->set('debugbar', 'DebugBar\StandardDebugBar');
+
+        $this->model = new Model(Container::$app);
     }
 
     public function testContainer()
