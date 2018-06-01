@@ -1,24 +1,21 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
- * Date: 17.02.17
- * Time: 13:23
- *
  * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2016, Korotkov Danila
+ * @copyright Copyright (c) 2018, Korotkov Danila
  * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
  *
  *  phpunit src/tests/ContainerTest --coverage-html src/tests/coverage-html
  */
 
+namespace Rudra\Tests;
 
-use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
-use Rudra\ContainerInterface;
-use Rudra\Container;
 use Rudra\Model;
-
+use Rudra\Container;
+use Rudra\Interfaces\ContainerInterface;
+use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
 /**
  * Class ModelTest
@@ -41,7 +38,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testContainer()
     {
-        $this->assertInstanceOf(ContainerInterface::class,$this->model()->container());
+        $this->assertInstanceOf(ContainerInterface::class, $this->model()->container());
     }
 
     /**

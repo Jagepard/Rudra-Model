@@ -1,12 +1,12 @@
 {
     "name"              : "rudra/model",
-    "description"       : "The Rudra framework",
+    "description"       : "Rudra framework",
     "type"              : "library",
     "keywords"          : [
         "rudra",
         "model"
     ],
-    "license"           : "MIT",
+    "license"           : "GPL-3.0-or-later",
     "authors"           : [
         {
             "name"     : "Danila Korotkov (Jagepard)",
@@ -26,11 +26,16 @@
         "maximebf/debugbar" : "1.*"
     },
     "require-dev"       : {
-        "satooshi/php-coveralls" : "dev-master"
+        "phpunit/phpunit": "^7"
     },
     "autoload"          : {
         "psr-4" : {
             "Rudra\\" : "src/"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4": {
+            "Rudra\\Tests\\" : "tests/"
         }
     },
     "minimum-stability" : "dev",
