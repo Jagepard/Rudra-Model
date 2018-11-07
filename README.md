@@ -10,3 +10,5 @@
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-498e7f.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # Rudra-Model | [API](https://github.com/Jagepard/Rudra-Model/blob/master/docs.md "Documentation API")
+
+![Rudra-Model](https://github.com/Jagepard/Rudra-Model/blob/master/UML.png)
