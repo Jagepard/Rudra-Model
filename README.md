@@ -7,8 +7,6 @@
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/Jagepard/Rudra-Model/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 [![Latest Stable Version](https://poser.pugx.org/rudra/model/v/stable)](https://packagist.org/packages/rudra/model)
 [![Total Downloads](https://poser.pugx.org/rudra/model/downloads)](https://packagist.org/packages/rudra/model)
-[![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-498e7f.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![GitHub](https://img.shields.io/github/license/jagepard/Rudra-Model.svg)
 
 # Rudra-Model | [API](https://github.com/Jagepard/Rudra-Model/blob/master/docs.md "Documentation API")
-
-![Rudra-Model](https://github.com/Jagepard/Rudra-Model/blob/master/UML.png)
