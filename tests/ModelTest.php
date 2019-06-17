@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /**
- * @author    : Korotkov Danila <dankorot@gmail.com>
- * @copyright Copyright (c) 2018, Korotkov Danila
- * @license   http://www.gnu.org/licenses/gpl.html GNU GPLv3.0
+ * @author    : Jagepard <jagepard@yandex.ru">
+ * @copyright Copyright (c) 2019, Jagepard
+ * @license   https://mit-license.org/ MIT
  *
  *  phpunit src/tests/ContainerTest --coverage-html src/tests/coverage-html
  */
@@ -17,34 +17,15 @@ use Rudra\Container;
 use Rudra\Interfaces\ContainerInterface;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
-/**
- * Class ModelTest
- */
 class ModelTest extends PHPUnit_Framework_TestCase
 {
-
-    /**
-     * @var Model
-     */
-    protected $model;
-
     protected function setUp(): void
     {
-        Container::app()->set('debugbar', 'DebugBar\StandardDebugBar');
-
-        $this->model = new Model(Container::$app);
+        rudra()->set('debugbar', 'DebugBar\StandardDebugBar');
     }
 
     public function testContainer()
     {
-        $this->assertInstanceOf(ContainerInterface::class, $this->model()->container());
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function model(): Model
-    {
-        return $this->model;
+        $this->assertInstanceOf(ContainerInterface::class, (new Model(rudra()))->container());
     }
 }
