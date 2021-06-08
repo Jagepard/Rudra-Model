@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * @author    : Jagepard <jagepard@yandex.ru">
@@ -22,14 +22,14 @@ class Model
 
     public static function __callStatic($method, $parameters = [])
     {
-        $className = str_replace("Models", "Repository", get_called_class())."Repository";
+        $className = str_replace("Models", "Repository", get_called_class()) . "Repository";
 
         return $className::$method(...$parameters);
     }
 
     public static function qBuilder($qs, $qp = [])
     {
-        $stmt  = Rudra::get("MySQL")->prepare($qs);
+        $stmt = Rudra::get("MySQL")->prepare($qs);
         $stmt->execute($qp);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -40,7 +40,7 @@ class Model
         $fields = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
         $table  = static::$table;
 
-        $stmt   = Rudra::get("MySQL")->query("
+        $stmt = Rudra::get("MySQL")->query("
             SELECT {$fields} FROM {$table} 
             ORDER BY id DESC 
             LIMIT {$pagination->getOffset()}, {$pagination->getPerPage()}
@@ -190,7 +190,7 @@ class Model
             WHERE {$column} LIKE :search");
 
         $query->execute([
-            ':search' => '%'.$search.'%',
+            ':search' => '%' . $search . '%',
         ]);
 
         return $query->fetchAll(\PDO::FETCH_ASSOC);
@@ -201,7 +201,7 @@ class Model
         $processed = [
             'csrf_field' => Validation::sanitize(Request::post()->get("csrf_field"))->csrf(Session::get("csrf_token"))->run(),
             'id'         => Validation::sanitize(Request::put()->get('id'))->run(),
-            'page'       => Validation::sanitize(Request::put()->get('page'))->run(),
+            'redirect'   => Validation::sanitize(Request::put()->get('redirect'))->run(),
         ];
 
         $validated = Validation::getValidated($processed, ["csrf_field", "_method"]);
@@ -223,7 +223,7 @@ class Model
             self::update($updateArr);
             $table = static::$table;
 
-            Redirect::run("crud/{$table}/page/{$validated['page']}");
+            Redirect::run(ltrim($validated['redirect'], '/'));
         }
     }
 }
