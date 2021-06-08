@@ -43,6 +43,18 @@ class QB
         return $this;
     }
 
+    public function limit($qp)
+    {
+        $this->query .= "LIMIT $qp ";
+        return $this;
+    }
+
+    public function offset($qp)
+    {
+        $this->query .= "OFFSET $qp ";
+        return $this;
+    }
+
     public function orderBy($qp)
     {
         $this->query .= "ORDER BY $qp ";
@@ -63,7 +75,7 @@ class QB
 
     public function get(): string
     {
-        $result      = $this->query;
+        $result      = $this->query . ';';
         $this->query = '';
 
         return $result;
