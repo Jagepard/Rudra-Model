@@ -19,6 +19,7 @@ use Rudra\Validation\ValidationFacade as Validation;
 class Model
 {
     public static string $table;
+    public static string $directory;
 
     public static function __callStatic($method, $parameters = [])
     {
@@ -187,7 +188,8 @@ class Model
 
         $query = Rudra::get("MySQL")->prepare("
             SELECT {$fields} FROM {$table} 
-            WHERE {$column} LIKE :search");
+            WHERE {$column} LIKE :search
+            ORDER BY id DESC");
 
         $query->execute([
             ':search' => '%' . $search . '%',
@@ -224,6 +226,29 @@ class Model
             $table = static::$table;
 
             Redirect::run(ltrim($validated['redirect'], '/'));
+        } else {
+            dd(Validation::getAlerts($processed));
         }
+    }
+
+    public static function qCache(array $path, array $data = [])
+    {
+        $directory = static::$directory . '/cache';
+
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = "$directory/$path[0].dat";
+
+        file_put_contents($file, serialize($data));
+
+        $cacheTime = $path[1] ?? Rudra::config()->get('cache.time');
+
+        if (file_exists($file) && (strtotime($cacheTime, filemtime($file)) > time())) {
+            return unserialize(file_get_contents($file));
+        }
+
+        return $data;
     }
 }
