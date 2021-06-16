@@ -231,23 +231,24 @@ class Model
         }
     }
 
-    public static function qCache(array $path, array $data = [])
+    public static function qCache(array $path)
     {
         $directory = static::$directory . '/cache';
+        $file      = "$directory/$path[0].dat";
+        $cacheTime = $path[1] ?? Rudra::config()->get('cache.time');
 
         if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
-        $file = "$directory/$path[0].dat";
-
-        file_put_contents($file, serialize($data));
-
-        $cacheTime = $path[1] ?? Rudra::config()->get('cache.time');
-
         if (file_exists($file) && (strtotime($cacheTime, filemtime($file)) > time())) {
             return unserialize(file_get_contents($file));
         }
+
+        $method = $path[0];
+        $data   = static::$method();
+
+        file_put_contents($file, serialize(static::$method()));
 
         return $data;
     }
