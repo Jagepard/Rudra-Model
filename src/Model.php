@@ -246,9 +246,9 @@ class Model
         }
 
         $method = $path[0];
-        $data   = static::$method();
+        $data   = isset($path[2]) ? static::$method(...$path[2]) : static::$method();
 
-        file_put_contents($file, serialize(static::$method()));
+        file_put_contents($file, serialize($data));
 
         return $data;
     }
