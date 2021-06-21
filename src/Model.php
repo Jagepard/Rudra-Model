@@ -245,7 +245,7 @@ class Model
             return unserialize(file_get_contents($file));
         }
 
-        $method = $path[0];
+        $method = (strpos($path[0], '_') !== false) ? strstr($path[0], '_', true) : $path[0];
         $data   = (!array_key_exists(2, $path)) ? static::$method() : static::$method(...$path[2]);
 
         file_put_contents($file, serialize($data));
