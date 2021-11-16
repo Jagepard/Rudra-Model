@@ -30,7 +30,7 @@ class Model
 
     public static function qBuilder($qs, $qp = [])
     {
-        $stmt = Rudra::get("MySQL")->prepare($qs);
+        $stmt = Rudra::get("DSN")->prepare($qs);
         $stmt->execute($qp);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -41,7 +41,7 @@ class Model
         $fields = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
         $table  = static::$table;
 
-        $stmt = Rudra::get("MySQL")->query("
+        $stmt = Rudra::get("DSN")->query("
             SELECT {$fields} FROM {$table} 
             ORDER BY id DESC 
             LIMIT {$pagination->getOffset()}, {$pagination->getPerPage()}
@@ -53,7 +53,7 @@ class Model
     public static function find($id)
     {
         $table = static::$table;
-        $stmt  = Rudra::get("MySQL")->prepare("
+        $stmt  = Rudra::get("DSN")->prepare("
                 SELECT * FROM {$table} 
                 WHERE id = :id
         ");
@@ -69,7 +69,7 @@ class Model
     {
         $fields = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
         $table  = static::$table;
-        $stmt   = Rudra::get("MySQL")->query("SELECT {$fields} FROM {$table} ORDER BY id ASC");
+        $stmt   = Rudra::get("DSN")->query("SELECT {$fields} FROM {$table} ORDER BY id ASC");
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -77,7 +77,7 @@ class Model
     public static function numRows()
     {
         $table = static::$table;
-        $count = Rudra::get("MySQL")->query("SELECT COUNT(*) FROM {$table}");
+        $count = Rudra::get("DSN")->query("SELECT COUNT(*) FROM {$table}");
 
         return $count->fetchColumn();
     }
@@ -85,7 +85,7 @@ class Model
     public static function findBy($field, $value)
     {
         $table = static::$table;
-        $stmt  = Rudra::get("MySQL")->prepare("
+        $stmt  = Rudra::get("DSN")->prepare("
                 SELECT * FROM {$table} 
                 WHERE {$field} = :val
         ");
@@ -99,7 +99,7 @@ class Model
 
     public static function lastInsertId()
     {
-        return Rudra::get("MySQL")->lastInsertId();
+        return Rudra::get("DSN")->lastInsertId();
     }
 
     public static function update($fields)
@@ -110,7 +110,7 @@ class Model
         $stmtString   = static::updateStmtString($fields);
         $fields['id'] = $id;
 
-        $query = Rudra::get("MySQL")->prepare("
+        $query = Rudra::get("DSN")->prepare("
                 UPDATE {$table} SET {$stmtString}
                 WHERE id =:id");
 
@@ -122,7 +122,7 @@ class Model
         $table      = static::$table;
         $stmtString = static::createStmtString($fields);
 
-        $query = Rudra::get("MySQL")->prepare("
+        $query = Rudra::get("DSN")->prepare("
                 INSERT INTO {$table} ({$stmtString[0]}) 
                 VALUES ({$stmtString[1]})");
 
@@ -132,7 +132,7 @@ class Model
     public static function delete($id)
     {
         $table = static::$table;
-        $query = Rudra::get("MySQL")->prepare("DELETE FROM {$table} WHERE id = :id");
+        $query = Rudra::get("DSN")->prepare("DELETE FROM {$table} WHERE id = :id");
         $query->execute([':id' => $id]);
     }
 
@@ -163,7 +163,7 @@ class Model
     public static function getColumns()
     {
         $table = static::$table;
-        $query = Rudra::get("MySQL")->query("SHOW COLUMNS FROM {$table}");
+        $query = Rudra::get("DSN")->query("SHOW COLUMNS FROM {$table}");
 
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -186,7 +186,7 @@ class Model
         $table  = static::$table;
         $fields = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
 
-        $query = Rudra::get("MySQL")->prepare("
+        $query = Rudra::get("DSN")->prepare("
             SELECT {$fields} FROM {$table} 
             WHERE {$column} LIKE :search
             ORDER BY id DESC");
