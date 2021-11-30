@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 /**
  * @author    : Jagepard <jagepard@yandex.ru">
@@ -38,23 +38,22 @@ class Model
 
     public static function getAllPerPage(Pagination $pagination, string $fields = null)
     {
-        $fields = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
-        $table  = static::$table;
+        $fields  = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
+        $table   = static::$table;
+        $qString = QBFacade::select($fields)
+            ->from($table)
+            ->orderBy("id DESC")
+            ->limit($pagination->getPerPage())->offset($pagination->getOffset())
+            ->get();
 
-        $stmt = Rudra::get("DSN")->query("
-            SELECT {$fields} FROM {$table} 
-            ORDER BY id DESC 
-            LIMIT {$pagination->getOffset()}, {$pagination->getPerPage()}
-        ");
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return self::qBuilder($qString);
     }
 
     public static function find($id)
     {
         $table = static::$table;
         $stmt  = Rudra::get("DSN")->prepare("
-                SELECT * FROM {$table} 
+                SELECT * FROM {$table}
                 WHERE id = :id
         ");
 
@@ -65,13 +64,16 @@ class Model
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public static function getAll(string $fields = null)
+    public static function getAll(string $sort = 'id', string $fields = null)
     {
-        $fields = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
-        $table  = static::$table;
-        $stmt   = Rudra::get("DSN")->query("SELECT {$fields} FROM {$table} ORDER BY id ASC");
+        $fields  = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
+        $table   = static::$table;
+        $qString = QBFacade::select($fields)
+            ->from($table)
+            ->orderBy("id ASC")
+            ->get();
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return self::qBuilder($qString);
     }
 
     public static function numRows()
@@ -86,7 +88,7 @@ class Model
     {
         $table = static::$table;
         $stmt  = Rudra::get("DSN")->prepare("
-                SELECT * FROM {$table} 
+                SELECT * FROM {$table}
                 WHERE {$field} = :val
         ");
 
@@ -123,7 +125,7 @@ class Model
         $stmtString = static::createStmtString($fields);
 
         $query = Rudra::get("DSN")->prepare("
-                INSERT INTO {$table} ({$stmtString[0]}) 
+                INSERT INTO {$table} ({$stmtString[0]})
                 VALUES ({$stmtString[1]})");
 
         $query->execute($fields);
@@ -187,9 +189,10 @@ class Model
         $fields = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
 
         $query = Rudra::get("DSN")->prepare("
-            SELECT {$fields} FROM {$table} 
+            SELECT {$fields} FROM {$table}
             WHERE {$column} LIKE :search
-            ORDER BY id DESC");
+            ORDER BY id DESC
+            LIMIT 10");
 
         $query->execute([
             ':search' => '%' . $search . '%',
@@ -235,7 +238,7 @@ class Model
     {
         $directory = static::$directory . '/cache';
         $file      = "$directory/$path[0].dat";
-        $cacheTime = $path[1] ?? Rudra::config()->get('cache.time');
+        $cacheTime = $path[2] ?? Rudra::config()->get('cache.time');
 
         if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
@@ -246,8 +249,7 @@ class Model
         }
 
         $method = (strpos($path[0], '_') !== false) ? strstr($path[0], '_', true) : $path[0];
-        $data   = (!array_key_exists(2, $path)) ? static::$method() : static::$method(...$path[2]);
-
+        $data   = (!array_key_exists(1, $path)) ? static::$method() : static::$method(...$path[1]);
         file_put_contents($file, serialize($data));
 
         return $data;
