@@ -28,10 +28,10 @@ class Model
         return $className::$method(...$parameters);
     }
 
-    public static function qBuilder($qs, $qp = [])
+    public static function qBuilder($queryString, $queryParams = [])
     {
-        $stmt = Rudra::get("DSN")->prepare($qs);
-        $stmt->execute($qp);
+        $stmt = Rudra::get("DSN")->prepare($queryString);
+        $stmt->execute($queryParams);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -165,7 +165,10 @@ class Model
     public static function getColumns()
     {
         $table = static::$table;
-        $query = Rudra::get("DSN")->query("SHOW COLUMNS FROM {$table}");
+        $query = Rudra::get("DSN")->query("SELECT column_name, data_type
+            FROM information_schema.columns 
+            WHERE table_name = '{$table}'"
+        );
 
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -174,7 +177,7 @@ class Model
     {
         if (!isset($fields)) {
             foreach (static::getColumns() as $column) {
-                $fields[] = $column['Field'];
+                $fields[] = $column['column_name'];
             }
         } else {
             $fields = explode(', ', $fields);
@@ -234,11 +237,11 @@ class Model
         }
     }
 
-    public static function qCache(array $path)
+    public static function qCache(array $params, $cacheTime = null)
     {
         $directory = static::$directory . '/cache';
-        $file      = "$directory/$path[0].dat";
-        $cacheTime = $path[2] ?? Rudra::config()->get('cache.time');
+        $file      = "$directory/$params[0].dat";
+        $cacheTime = $cacheTime ?? Rudra::config()->get('cache.time');
 
         if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
@@ -248,8 +251,8 @@ class Model
             return unserialize(file_get_contents($file));
         }
 
-        $method = (strpos($path[0], '_') !== false) ? strstr($path[0], '_', true) : $path[0];
-        $data   = (!array_key_exists(1, $path)) ? static::$method() : static::$method(...$path[1]);
+        $method = (strpos($params[0], '_') !== false) ? strstr($params[0], '_', true) : $params[0];
+        $data   = (!array_key_exists(1, $params)) ? static::$method() : static::$method(...$params[1]);
         file_put_contents($file, serialize($data));
 
         return $data;

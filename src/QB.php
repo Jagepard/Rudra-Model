@@ -25,51 +25,51 @@ class QB
         return $this;
     }
 
-    public function where($qp)
+    public function where($param)
     {
-        $this->query .= "WHERE $qp ";
+        $this->query .= "WHERE $param ";
         return $this;
     }
 
-    public function and($qp)
+    public function and($param)
     {
-        $this->query .= "AND $qp ";
+        $this->query .= "AND $param ";
         return $this;
     }
 
-    public function or($qp)
+    public function or($param)
     {
-        $this->query .= "OR $qp ";
+        $this->query .= "OR $param ";
         return $this;
     }
 
-    public function limit($qp)
+    public function limit($param)
     {
-        $this->query .= "LIMIT $qp ";
+        $this->query .= "LIMIT $param ";
         return $this;
     }
 
-    public function offset($qp)
+    public function offset($param)
     {
-        $this->query .= "OFFSET $qp ";
+        $this->query .= "OFFSET $param ";
         return $this;
     }
 
-    public function orderBy($qp)
+    public function orderBy($param)
     {
-        $this->query .= "ORDER BY $qp ";
+        $this->query .= "ORDER BY $param ";
         return $this;
     }
 
-    public function join($qp)
+    public function join($param)
     {
-        $this->query .= "LEFT JOIN $qp ";
+        $this->query .= "LEFT JOIN $param ";
         return $this;
     }
 
-    public function on($qp)
+    public function on($param)
     {
-        $this->query .= "ON $qp ";
+        $this->query .= "ON $param ";
         return $this;
     }
 
