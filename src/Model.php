@@ -240,7 +240,7 @@ class Model
     public static function qCache(array $params, $cacheTime = null)
     {
         $directory = static::$directory . '/cache';
-        $file      = "$directory/$params[0].dat";
+        $file      = "$directory/$params[0].json";
         $cacheTime = $cacheTime ?? Rudra::config()->get('cache.time');
 
         if (!is_dir($directory)) {
@@ -248,12 +248,12 @@ class Model
         }
 
         if (file_exists($file) && (strtotime($cacheTime, filemtime($file)) > time())) {
-            return unserialize(file_get_contents($file));
+            return json_decode(file_get_contents($file));
         }
 
         $method = (strpos($params[0], '_') !== false) ? strstr($params[0], '_', true) : $params[0];
         $data   = (!array_key_exists(1, $params)) ? static::$method() : static::$method(...$params[1]);
-        file_put_contents($file, serialize($data));
+        file_put_contents($file, json_encode($data, JSON_UNESCAPED_UNICODE));
 
         return $data;
     }
