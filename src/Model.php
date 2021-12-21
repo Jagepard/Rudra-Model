@@ -248,7 +248,7 @@ class Model
         }
 
         if (file_exists($file) && (strtotime($cacheTime, filemtime($file)) > time())) {
-            return json_decode(file_get_contents($file));
+            return json_decode(file_get_contents($file), true);
         }
 
         $method = (strpos($params[0], '_') !== false) ? strstr($params[0], '_', true) : $params[0];
