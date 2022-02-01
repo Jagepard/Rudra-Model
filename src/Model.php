@@ -165,10 +165,15 @@ class Model
     public static function getColumns()
     {
         $table = static::$table;
-        $query = Rudra::get("DSN")->query("SELECT column_name, data_type
-            FROM information_schema.columns 
-            WHERE table_name = '{$table}'"
-        );
+
+        if (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            $query = Rudra::get("DSN")->query("SHOW COLUMNS FROM {$table}");
+        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            $query = Rudra::get("DSN")->query("SELECT column_name, data_type
+                FROM information_schema.columns 
+                WHERE table_name = '{$table}'"
+            );
+        }
 
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -176,8 +181,14 @@ class Model
     public static function getFields(string $fields = null)
     {
         if (!isset($fields)) {
-            foreach (static::getColumns() as $column) {
-                $fields[] = $column['column_name'];
+            if (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+                foreach (static::getColumns() as $column) {
+                    $fields[] = $column['Field'];
+                }
+            } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+                foreach (static::getColumns() as $column) {
+                    $fields[] = $column['column_name'];
+                }
             }
         } else {
             $fields = explode(', ', $fields);
