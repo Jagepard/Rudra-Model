@@ -250,7 +250,7 @@ class Model
 
     public static function qCache(array $params, $cacheTime = null)
     {
-        $directory = static::$directory . '/cache';
+        $directory = static::$directory . DIRECTORY_SEPARATOR . 'cache';
         $file      = "$directory/$params[0].json";
         $cacheTime = $cacheTime ?? Rudra::config()->get('cache.time');
 
