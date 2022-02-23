@@ -173,6 +173,9 @@ class Model
                 FROM information_schema.columns 
                 WHERE table_name = '{$table}'"
             );
+        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+                $query = Rudra::get("DSN")->query("PRAGMA table_info('{$table}')"
+            );
         }
 
         return $query->fetchAll(\PDO::FETCH_ASSOC);
@@ -188,6 +191,10 @@ class Model
             } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
                 foreach (static::getColumns() as $column) {
                     $fields[] = $column['column_name'];
+                }
+            } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+                foreach (static::getColumns() as $column) {
+                    $fields[] = $column['name'];
                 }
             }
         } else {
