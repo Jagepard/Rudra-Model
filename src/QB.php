@@ -61,9 +61,9 @@ class QB
         return $this;
     }
 
-    public function join($param)
+    public function join($param, $type = "LEFT")
     {
-        $this->query .= "LEFT JOIN $param ";
+        $this->query .= "$type JOIN $param ";
         return $this;
     }
 
