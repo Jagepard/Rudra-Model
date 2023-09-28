@@ -19,6 +19,12 @@ class QB
         return $this;
     }
 
+    public function array_agg(string $fieldName, string $alias, string $orderBy)
+    {
+        $this->query .= ", array_to_json(array_agg($fieldName ORDER BY $orderBy)) $alias  ";        
+        return $this;
+    }
+
     public function from($table)
     {
         $this->query .= "FROM {$table} ";
@@ -58,6 +64,12 @@ class QB
     public function orderBy($param)
     {
         $this->query .= "ORDER BY $param ";
+        return $this;
+    }
+
+    public function groupBy($param)
+    {
+        $this->query .= "GROUP BY $param ";
         return $this;
     }
 
