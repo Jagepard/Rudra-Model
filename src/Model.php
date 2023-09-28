@@ -21,6 +21,15 @@ class Model
     public static string $table;
     public static string $directory;
 
+    /**
+     * Calls unavailable methods in a static context in the Repository namespace
+     * -------------------------------------------------------------------------
+     * Вызывает недоступные методы в статическом контексте в пространстве имен репозитория.
+     *
+     * @param  $method
+     * @param  array  $parameters
+     * @return void
+     */
     public static function __callStatic($method, $parameters = [])
     {
         $className = str_replace("Models", "Repository", get_called_class()) . "Repository";
@@ -28,6 +37,15 @@ class Model
         return $className::$method(...$parameters);
     }
 
+    /**
+     * Represents a prepared database query and, when the query is executed, the corresponding result set.
+     * ---------------------------------------------------------------------------------------------------
+     * Представляет подготовленный запрос к базе данных, а после выполнения запроса соответствующий результирующий набор. 
+     *
+     * @param  $queryString
+     * @param  array  $queryParams
+     * @return void
+     */
     public static function qBuilder($queryString, $queryParams = [])
     {
         $stmt = Rudra::get("DSN")->prepare($queryString);
@@ -36,6 +54,15 @@ class Model
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieves all data, taking into account paging.
+     * -----------------------------------------------
+     * Получает все данные с учетом постраничного разбиения.
+     *
+     * @param  Pagination  $pagination
+     * @param  string|null $fields
+     * @return void
+     */
     public static function getAllPerPage(Pagination $pagination, string $fields = null)
     {
         $fields  = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
@@ -49,6 +76,14 @@ class Model
         return self::qBuilder($qString);
     }
 
+    /**
+     * Finds an element in the database by id
+     * --------------------------------------
+     * Находит элемент в базе данных по идентификатору
+     *
+     * @param  id
+     * @return void
+     */
     public static function find($id)
     {
         $table = static::$table;
@@ -64,6 +99,15 @@ class Model
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieves all items from the database according to the parameters
+     * -----------------------------------------------------------------
+     * Получает все элементы из базы данных  в соответствии с параметрами
+     *
+     * @param  string      $sort
+     * @param  string|null $fields
+     * @return void
+     */
     public static function getAll(string $sort = 'id', string $fields = null)
     {
         $fields  = !isset($fields) ? implode(',', static::getFields($fields)) : $fields;
@@ -76,6 +120,13 @@ class Model
         return self::qBuilder($qString);
     }
 
+    /**
+     * Gets the number of rows in a specific table
+     * -------------------------------------------
+     * Получает количество строк в определенной таблице
+     *
+     * @return void
+     */
     public static function numRows()
     {
         $table = static::$table;
@@ -84,6 +135,15 @@ class Model
         return $count->fetchColumn();
     }
 
+    /**
+     * Searches for an element by value in a given field
+     * -------------------------------------------------
+     * Ищет элемент по значению в заданном поле
+     *
+     * @param  $field
+     * @param  $value
+     * @return void
+     */
     public static function findBy($field, $value)
     {
         $table = static::$table;
@@ -99,11 +159,24 @@ class Model
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Returns the ID of the last inserted row or sequence value 
+     * ---------------------------------------------------------
+     * Возвращает ID последней вставленной строки или значение последовательности 
+     *
+     * @return void
+     */
     public static function lastInsertId()
     {
         return Rudra::get("DSN")->lastInsertId();
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param  [type] $fields
+     * @return void
+     */
     public static function update($fields)
     {
         $table = static::$table;
