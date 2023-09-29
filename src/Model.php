@@ -172,12 +172,14 @@ class Model
     }
 
     /**
-     * Undocumented function
+     * Updates a record in the database
+     * --------------------------------
+     * Обновляет запись в базе данных
      *
-     * @param  [type] $fields
+     * @param  array $fields
      * @return void
      */
-    public static function update($fields)
+    public static function update(array $fields)
     {
         $table = static::$table;
         $id    = $fields['id'];
@@ -192,7 +194,15 @@ class Model
         $query->execute($fields);
     }
 
-    public static function create($fields)
+    /**
+     * Adds an entry to the database
+     * -----------------------------
+     * Добавляет запись в базу данных
+     *
+     * @param array $fields
+     * @return void
+     */
+    public static function create(array $fields)
     {
         $table      = static::$table;
         $stmtString = static::createStmtString($fields);
@@ -204,6 +214,14 @@ class Model
         $query->execute($fields);
     }
 
+    /**
+     * Deletes an entry in the database
+     * --------------------------------
+     * Удаляет запись в базе данных
+     *
+     * @param  $id
+     * @return void
+     */
     public static function delete($id)
     {
         $table = static::$table;
@@ -211,6 +229,14 @@ class Model
         $query->execute([':id' => $id]);
     }
 
+    /**
+     * Prepares a row to update the database
+     * -------------------------------------
+     * Подготавливает строку для обновления базы данных
+     *
+     * @param  array $fields
+     * @return void
+     */
     protected static function updateStmtString(array $fields)
     {
         $stmtFields = [];
@@ -222,6 +248,14 @@ class Model
         return implode(",", $stmtFields);
     }
 
+    /**
+     * Prepares a row to be added to the database
+     * ------------------------------------------
+     * Подготавливает строку для добавления в базу данных
+     *
+     * @param  array $fields
+     * @return void
+     */
     protected static function createStmtString(array $fields)
     {
         $insert  = [];
@@ -235,6 +269,13 @@ class Model
         return [implode(",", $insert), implode(",", $execute)];
     }
 
+    /**
+     * Gets the names of the columns in the table
+     * ------------------------------------------
+     * Получает название столбцов в таблице
+     *
+     * @return void
+     */
     public static function getColumns()
     {
         $table = static::$table;
@@ -254,6 +295,14 @@ class Model
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Gets the values of fields in a table
+     * ------------------------------------
+     * Получает значение полей в таблице
+     *
+     * @param  string|null $fields
+     * @return void
+     */
     public static function getFields(string $fields = null)
     {
         if (!isset($fields)) {
@@ -277,6 +326,16 @@ class Model
         return $fields;
     }
 
+    /**
+     * Searches the table for data that matches the parameters
+     * -------------------------------------------------------
+     * Ищет в таблице данные соответствующие параметрам
+     *
+     * @param  string      $search
+     * @param  string      $column
+     * @param  string|null $fields
+     * @return void
+     */
     public static function search(string $search, string $column, string $fields = null)
     {
         $table  = static::$table;
@@ -295,6 +354,13 @@ class Model
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Helper method for writing a toggle
+     * ----------------------------------
+     * Вспомогательный метод для написания переключателя
+     *
+     * @return void
+     */
     public static function toggle()
     {
         $processed = [
@@ -328,6 +394,15 @@ class Model
         }
     }
 
+    /**
+     * Caches a database query
+     * -----------------------
+     * Кэширует запрос к базе данных
+     *
+     * @param  array  $params
+     * @param  $cacheTime
+     * @return void
+     */
     public static function qCache(array $params, $cacheTime = null)
     {
         $directory = static::$directory . DIRECTORY_SEPARATOR . 'cache';
