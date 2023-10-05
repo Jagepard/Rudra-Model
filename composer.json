@@ -24,7 +24,8 @@
         "rudra/container" : "9999999-dev",
         "rudra/redirect"  : "dev-master",
         "rudra/pagination": "dev-master",
-        "rudra/validation": "dev-master"
+        "rudra/validation": "dev-master",
+        "rudra/docs": "dev-master"
     },
     "autoload"         : {
         "psr-4": {
