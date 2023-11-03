@@ -1,6 +1,7 @@
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Jagepard/Rudra-Model/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Jagepard/Rudra-Model/?branch=master)
 [![Code Climate](https://codeclimate.com/github/Jagepard/Rudra-Model/badges/gpa.svg)](https://codeclimate.com/github/Jagepard/Rudra-Model)
+[![CodeFactor](https://www.codefactor.io/repository/github/jagepard/rudra-model/badge)](https://www.codefactor.io/repository/github/jagepard/rudra-model)
 -----
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/Jagepard/Rudra-Model/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 [![Latest Stable Version](https://poser.pugx.org/rudra/model/v/stable)](https://packagist.org/packages/rudra/model)
