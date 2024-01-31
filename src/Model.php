@@ -176,13 +176,13 @@ class Model
      * --------------------------------
      * Обновляет запись в базе данных
      *
-     * @param  array $fields
+     * @param  string $id
+     * @param  array  $fields
      * @return void
      */
-    public static function update(array $fields)
+    public static function update(string $id, array $fields)
     {
         $table = static::$table;
-        $id    = $fields['id'];
         unset($fields['id']);
         $stmtString   = static::updateStmtString($fields);
         $fields['id'] = $id;
