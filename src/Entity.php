@@ -17,7 +17,12 @@ class Entity
      */
     public static function __callStatic($method, $parameters = [])
     {       
-        $className   = str_replace("Entity", "Model", get_called_class());
+        $className  = str_replace("Entity", "Model", get_called_class());
+
+        if (!class_exists($className)) {
+            $className  = str_replace("Entity", "Repository", get_called_class() . "Repository");
+        }
+
         $newInstance = new $className(static::$table);
 
         return $newInstance->$method(...$parameters);
