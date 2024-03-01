@@ -28,6 +28,15 @@ class Entity
             $className  = str_replace("Entity", "Repository", get_called_class() . "Repository");
         }
 
+        /**
+         * If there is no Repository, then call the parent Repository
+         * ----------------------------------------------------------
+         * Если нет Репозитория, то вызываем родительский Репозиторий
+         */
+        if (!class_exists($className)) {
+            $className = Repository::class;
+        }
+
         $newInstance = new $className(static::$table);
 
         return $newInstance->$method(...$parameters);
