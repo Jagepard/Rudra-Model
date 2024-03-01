@@ -19,6 +19,11 @@ class Entity
     {       
         $className  = str_replace("Entity", "Model", get_called_class());
 
+        /**
+         * If there is no Model, then call the Repository
+         * ----------------------------------------------
+         * Если нет Модели, то вызываем Репозиторий
+         */
         if (!class_exists($className)) {
             $className  = str_replace("Entity", "Repository", get_called_class() . "Repository");
         }
