@@ -31,7 +31,17 @@ class Model
      */
     public function __call($method, $parameters = [])
     {      
-        $className   = str_replace("Model", "Repository", get_called_class()) . "Repository";
+        $className = str_replace("Model", "Repository", get_called_class()) . "Repository";
+
+        /**
+         * If there is no Repository, then call the parent Repository
+         * ----------------------------------------------------------
+         * Если нет Репозитория, то вызываем родительский Репозиторий
+         */
+        if (!class_exists($className)) {
+            $className = Repository::class;
+        }
+
         $newInstance = new $className($this->table);
 
         if (method_exists($newInstance, $method)) {
