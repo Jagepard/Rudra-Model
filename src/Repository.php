@@ -2,10 +2,10 @@
 
 namespace Rudra\Model;
 
-use Rudra\Container\Facades\Request;
-use Rudra\Container\Facades\Rudra;
-use Rudra\Container\Facades\Session;
 use Rudra\Pagination;
+use Rudra\Container\Facades\Rudra;
+use Rudra\Container\Facades\Request;
+use Rudra\Container\Facades\Session;
 use Rudra\Redirect\RedirectFacade as Redirect;
 use Rudra\Validation\ValidationFacade as Validation;
 
@@ -28,7 +28,7 @@ class Repository
      * @param  array  $queryParams
      * @return void
      */
-    public function qBuilder($queryString, $queryParams = [])
+    public function qBuilder($queryString, $queryParams = []): array
     {
         $stmt = Rudra::get("DSN")->prepare($queryString);
         $stmt->execute($queryParams);
@@ -65,7 +65,7 @@ class Repository
      * @param  id
      * @return void
      */
-    public function find($id)
+    public function find($id): array
     {
         $stmt = Rudra::get("DSN")->prepare("
                 SELECT * FROM {$this->table}
