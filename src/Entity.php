@@ -2,8 +2,6 @@
 
 namespace Rudra\Model;
 
-use Rudra\Exceptions\RudraException;
-
 class Entity
 {
     /**
@@ -12,12 +10,36 @@ class Entity
      * Вызывает недоступные методы в статическом контексте в пространстве имен модели.
      *
      * @param  $method
-     * @param  array  $parameters
+     * @param array $parameters
      * @return void
      */
-    public static function __callStatic($method, $parameters = [])
-    {       
-        $className  = str_replace("Entity", "Model", get_called_class());
+    public static function __callStatic($method, array $parameters = [])
+    {
+        return self::callMethod($method, $parameters);
+    }
+
+    /**
+     * Calls unavailable methods in the Model namespace
+     * -------------------------------------------------------
+     * Вызывает недоступные методы в пространстве имен модели.
+     *
+     * @param  $method
+     * @param array $parameters
+     * @return void
+     */
+    public function __call($method, array $parameters = [])
+    {
+        return self::callMethod($method, $parameters);
+    }
+
+    /**
+     * @param $method
+     * @param array $parameters
+     * @return mixed
+     */
+    protected static function callMethod($method, array $parameters)
+    {
+        $className = str_replace("Entity", "Model", get_called_class());
 
         /**
          * If there is no Model, then call the Repository
@@ -25,7 +47,7 @@ class Entity
          * Если нет Модели, то вызываем Репозиторий
          */
         if (!class_exists($className)) {
-            $className  = str_replace("Entity", "Repository", get_called_class() . "Repository");
+            $className = str_replace("Entity", "Repository", get_called_class() . "Repository");
         }
 
         /**

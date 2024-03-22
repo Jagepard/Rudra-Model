@@ -25,10 +25,10 @@ class Repository
      * Представляет подготовленный запрос к базе данных, а после выполнения запроса соответствующий результирующий набор. 
      *
      * @param  $queryString
-     * @param  array  $queryParams
+     * @param array $queryParams
      * @return void
      */
-    public function qBuilder($queryString, $queryParams = []): array
+    public function qBuilder($queryString, array $queryParams = []): array
     {
         $stmt = Rudra::get("DSN")->prepare($queryString);
         $stmt->execute($queryParams);

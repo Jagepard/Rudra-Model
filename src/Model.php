@@ -26,10 +26,11 @@ class Model
      * Вызывает недоступные методы в пространстве имен репозитория.
      *
      * @param  $method
-     * @param  array  $parameters
+     * @param array $parameters
      * @return void
+     * @throws RudraException
      */
-    public function __call($method, $parameters = [])
+    public function __call($method, array $parameters = [])
     {      
         $className = str_replace("Model", "Repository", get_called_class()) . "Repository";
 
