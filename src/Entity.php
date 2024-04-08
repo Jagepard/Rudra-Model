@@ -48,6 +48,10 @@ class Entity
          */
         if (!class_exists($className)) {
             $className = str_replace("Entity", "Repository", get_called_class() . "Repository");
+        } else {
+            throw new \Exception(
+                sprintf('Class %s does not exist', $className)
+            );
         }
 
         /**
