@@ -49,6 +49,6 @@ class Model
             return $newInstance->$method(...$parameters);
         }
 
-        throw new RudraException(sprintf('Method %s does not exist', $method));
+        throw new RudraException(sprintf('Method %s does not exists', $method));
     }
 }

@@ -6,6 +6,7 @@ use Rudra\Pagination;
 use Rudra\Container\Facades\Rudra;
 use Rudra\Container\Facades\Request;
 use Rudra\Container\Facades\Session;
+use Rudra\Exceptions\RudraException;
 use Rudra\Redirect\RedirectFacade as Redirect;
 use Rudra\Validation\ValidationFacade as Validation;
 
@@ -17,6 +18,11 @@ class Repository
     {
         $this->table = $table;
         $this->DSN   = Rudra::get("DSN");
+    }
+
+    public function __call($method, array $parameters = [])
+    {
+        throw new RudraException(sprintf('Method %s does not exists', $method));
     }
 
     /**
