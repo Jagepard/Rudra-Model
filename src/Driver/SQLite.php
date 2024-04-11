@@ -182,34 +182,34 @@ class SQLite
     public function integer($field, $default = "", $pk = false, $null = "NOT NULL")
     {
         if ($pk) {
-            return "$field INTEGER PRIMARY KEY, ";
+            return "$field INTEGER PRIMARY KEY";
         }
 
-        return "$field INTEGER $null $default, ";
+        return ", $field INTEGER $null $default";
     }
 
     public function string($field, $default = "", $null = "NOT NULL")
     {
-        return "$field TEXT $null $default, ";
+        return ", $field TEXT $null $default";
     }
 
     public function text($field, $null = "NOT NULL")
     {
-        return "$field TEXT $null, ";
+        return ", $field TEXT $null";
     }
 
     public function created_at()
     {
-        return "created_at TEXT DEFAULT CURRENT_TIMESTAMP, ";
+        return ", created_at TEXT DEFAULT CURRENT_TIMESTAMP";
     }
 
     public function updated_at()
     {
-        return "updated_at TEXT DEFAULT CURRENT_TIMESTAMP, ";
+        return ", updated_at TEXT DEFAULT CURRENT_TIMESTAMP";
     }
 
     public function pk($field)
     {
-        return "last_line TEXT";
+        return "";
     }
 }

@@ -192,34 +192,34 @@ class PgSQL
     public function integer($field, $default = "", $pk = false, $null = "NOT NULL")
     {
         if ($pk) {
-            return "$field SERIAL PRIMARY KEY, ";
+            return "$field SERIAL PRIMARY KEY";
         }
 
-        return "$field INTEGER $null $default, ";
+        return ", $field INTEGER $null $default";
     }
 
     public function string($field, $default = "", $null = "NOT NULL")
     {
-        return "$field VARCHAR(255) $null $default, ";
+        return ", $field VARCHAR(255) $null $default";
     }
 
     public function text($field, $null = "NOT NULL")
     {
-        return "$field TEXT $null, ";
+        return ", $field TEXT $null";
     }
 
     public function created_at()
     {
-        return "created_at TIMESTAMP without time zone, ";
+        return ", created_at TIMESTAMP without time zone";
     }
 
     public function updated_at()
     {
-        return "updated_at TIMESTAMP without time zone, ";
+        return ", updated_at TIMESTAMP without time zone";
     }
 
     public function pk($field)
     {
-        return "last_line TEXT";
+        return "";
     }
 }

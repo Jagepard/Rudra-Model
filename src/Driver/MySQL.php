@@ -182,34 +182,34 @@ class MySQL
     public function integer($field, $default = "", $autoincrement = false, $null = "NOT NULL")
     {
         if ($autoincrement) {
-            return "`$field` INT $null AUTO_INCREMENT $default,";
+            return "`$field` INT $null AUTO_INCREMENT $default";
         }
 
-        return "`$field` INT $null $default,";
+        return ", `$field` INT $null $default";
     }
 
     public function string($field, $default = "", $null = "NOT NULL")
     {
-        return "`$field` VARCHAR(255) $null $default,";
+        return ", `$field` VARCHAR(255) $null $default";
     }
 
     public function text($field, $null = "NOT NULL")
     {
-        return "`$field` text $null,";
+        return ", `$field` text $null";
     }
 
     public function created_at()
     {
-        return "`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,";
+        return ", `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
     }
 
     public function updated_at()
     {
-        return "`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,";
+        return ", `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
     }
 
     public function pk($field)
     {
-        return "PRIMARY KEY (`$field`)";
+        return ", PRIMARY KEY (`$field`)";
     }
 }
