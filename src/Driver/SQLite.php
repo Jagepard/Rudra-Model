@@ -7,41 +7,13 @@ declare(strict_types = 1);
  * @license   https://mit-license.org/ MIT
  */
 
-namespace Rudra\Model;
+namespace Rudra\Model\Driver;
 
-use Rudra\Model\Driver\MySQL;
-use Rudra\Model\Driver\PgSQL;
-use Rudra\Model\Driver\SQLite;
-use Rudra\Container\Facades\Rudra;
-
-class QB
+class SQLite
 {
-    private $driver;
-    private string $query = '';
-
-    public function __construct()
-    {
-        if (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
-            $this->driver = new MySQL;
-        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
-            $this->driver = new PgSQL;
-        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
-            $this->driver = new SQLite;
-        }
-    }
-
-    /**
-     * Selects data from the database
-     * ------------------------------
-     * Выбирает данные из базы данных
-     *
-     * @param  string|null $fields
-     * @return void
-     */
     public function select(?string $fields = '*')
     {
-        $this->query .= "SELECT {$fields} ";
-        return $this;
+        return "SELECT {$fields} ";
     }
 
     /**
@@ -70,8 +42,7 @@ class QB
      */
     public function from($table)
     {
-        $this->query .= "FROM {$table} ";
-        return $this;
+        return "FROM {$table} ";
     }
 
     /**
@@ -201,66 +172,44 @@ class QB
         return $this;
     }
 
-    /**
-     * Gets query string
-     * -----------------
-     * Получает строку запроса
-     *
-     * @return string
-     */
-    public function get(): string
-    {
-        $result      = $this->query . ';';
-        $this->query = '';
-
-        return $result;
-    }
-
-    public function create($table)
-    {
-        $this->query .= "CREATE TABLE {$table} (";
-        return $this;
-    }
+    #######################################
 
     public function close()
     {
-        $this->query .= $this->driver->close();
-        return $this;
+        return ")";
     }
 
-    public function integer($field, $default = "", $autoincrement = false, $null = "NOT NULL")
+    public function integer($field, $default = "", $pk = false, $null = "NOT NULL")
     {
-        $this->query .= $this->driver->integer($field, $default, $autoincrement, $null);
-        return $this;
+        if ($pk) {
+            return "$field INTEGER PRIMARY KEY, ";
+        }
+
+        return "$field INTEGER $null $default, ";
     }
 
     public function string($field, $default = "", $null = "NOT NULL")
     {
-        $this->query .= $this->driver->string($field, $default, $null);
-        return $this;
+        return "$field TEXT $null $default, ";
     }
 
     public function text($field, $null = "NOT NULL")
     {
-        $this->query .= $this->driver->text($field, $null);
-        return $this;
+        return "$field TEXT $null, ";
     }
 
     public function created_at()
     {
-        $this->query .= $this->driver->created_at();
-        return $this;
+        return "created_at TEXT DEFAULT CURRENT_TIMESTAMP, ";
     }
 
     public function updated_at()
     {
-        $this->query .= $this->driver->updated_at();
-        return $this;
+        return "updated_at TEXT DEFAULT CURRENT_TIMESTAMP, ";
     }
 
-    public function pk($field = null)
+    public function pk($field)
     {
-        $this->query .= $this->driver->pk($field);
-        return $this;
+        return "last_line TEXT";
     }
 }
