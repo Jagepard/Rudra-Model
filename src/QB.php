@@ -35,10 +35,10 @@ class QB
      * ------------------------------
      * Выбирает данные из базы данных
      *
-     * @param  string|null $fields
-     * @return void
+     * @param string $fields
+     * @return $this
      */
-    public function select(?string $fields = '*')
+    public function select(string $fields = '*'): self
     {
         $this->query .= "SELECT {$fields} ";
         return $this;
@@ -49,14 +49,14 @@ class QB
      * -----------------------
      * Принимает набор значений
      *
-     * @param  string $fieldName
-     * @param  string $alias
-     * @param  string $orderBy
-     * @return void
+     * @param string $fieldName
+     * @param string $alias
+     * @param string|null $orderBy
+     * @return $this
      */
-    public function array_agg(string $fieldName, string $alias, string $orderBy)
+    public function concat(string $fieldName, string $alias, ?string $orderBy = null): self
     {
-        $this->query .= ", array_to_json(array_agg($fieldName ORDER BY $orderBy)) $alias  ";        
+        $this->query .= $this->driver->concat($fieldName, $alias, $orderBy);
         return $this;
     }
 
@@ -65,10 +65,10 @@ class QB
      * ------------------------
      * Указывает название таблицы
      *
-     * @param  $table
-     * @return void
+     * @param string $table
+     * @return $this
      */
-    public function from($table)
+    public function from(string $table): self
     {
         $this->query .= "FROM {$table} ";
         return $this;
@@ -79,10 +79,10 @@ class QB
      * ----------------------------------------------------------
      * Предложение WHERE для фильтрации строк, возвращаемых инструкцией SELECT.
      *
-     * @param  $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function where($param)
+    public function where(string $param): self
     {
         $this->query .= "WHERE $param ";
         return $this;
@@ -93,10 +93,10 @@ class QB
      * --------------------
      * Логический оператор И
      *
-     * @param $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function and($param)
+    public function and(string $param): self
     {
         $this->query .= "AND $param ";
         return $this;
@@ -107,24 +107,24 @@ class QB
      * --------------------
      * Логический оператор ИЛИ
      *
-     * @param $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function or($param)
+    public function or(string $param): self
     {
         $this->query .= "OR $param ";
         return $this;
     }
 
     /**
-     * LIMIT is an optional clause of the SELECT statement 
+     * LIMIT is an optional clause of the SELECT statement
      * ---------------------------------------------------
      * LIMIT — необязательное предложение оператора SELECT.
      *
-     * @param  $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function limit($param)
+    public function limit(string $param): self
     {
         $this->query .= "LIMIT $param ";
         return $this;
@@ -135,10 +135,10 @@ class QB
      * -------------
      * Предложение OFFSET
      *
-     * @param  [type] $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function offset($param)
+    public function offset(string $param): self
     {
         $this->query .= "OFFSET $param ";
         return $this;
@@ -149,10 +149,10 @@ class QB
      * ----------------------------------------------------
      * Чтобы отсортировать строки результирующего набора, используйте ORDER BY
      *
-     * @param  $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function orderBy($param)
+    public function orderBy(string $param): self
     {
         $this->query .= "ORDER BY $param ";
         return $this;
@@ -163,25 +163,25 @@ class QB
      * -----------------------------------------------------------------------------------
      * Предложение GROUP BY делит строки, возвращаемые инструкцией SELECT, на группы
      *
-     * @param  $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function groupBy($param)
+    public function groupBy(string $param): self
     {
         $this->query .= "GROUP BY $param ";
         return $this;
     }
 
     /**
-     * PostgreSQL join is used to combine columns from one (self-join) or more tables
-     * ------------------------------------------------------------------------------
-     * Соединение PostgreSQL используется для объединения столбцов из одной (самообъединение) или нескольких таблиц
+     * PostgresSQL join is used to combine columns from one (self-join) or more tables
+     * * ------------------------------------------------------------------------------
+     * * Соединение PostgresSQL используется для объединения столбцов из одной (самообъединение) или нескольких таблиц
      *
-     * @param  $param
-     * @param  string $type
-     * @return void
+     * @param string $param
+     * @param string $type
+     * @return $this
      */
-    public function join($param, $type = "LEFT")
+    public function join(string $param, string $type = "LEFT"): self
     {
         $this->query .= "$type JOIN $param ";
         return $this;
@@ -192,10 +192,10 @@ class QB
      * -------------------
      * Соответствие значений
      *
-     * @param  $param
-     * @return void
+     * @param string $param
+     * @return $this
      */
-    public function on($param)
+    public function on(string $param): self
     {
         $this->query .= "ON $param ";
         return $this;
@@ -216,49 +216,84 @@ class QB
         return $result;
     }
 
-    public function create($table)
+    /**
+     * @param string $table
+     * @return $this
+     */
+    public function create(string $table): self
     {
         $this->query .= "CREATE TABLE {$table} (";
         return $this;
     }
 
-    public function close()
+    /**
+     * @return $this
+     */
+    public function close(): self
     {
         $this->query .= $this->driver->close();
         return $this;
     }
 
-    public function integer($field, $default = "", $autoincrement = false, $null = "NOT NULL")
+    /**
+     * @param string $field
+     * @param string $default
+     * @param bool $autoincrement
+     * @param string $null
+     * @return $this
+     */
+    public function integer(string $field, string $default = "", bool $autoincrement = false, string $null = "NOT NULL"): self
     {
         $this->query .= $this->driver->integer($field, $default, $autoincrement, $null);
         return $this;
     }
 
-    public function string($field, $default = "", $null = "NOT NULL")
+    /**
+     * @param string $field
+     * @param string $default
+     * @param string $null
+     * @return $this
+     */
+    public function string(string $field, string $default = "", string $null = "NOT NULL"): self
     {
         $this->query .= $this->driver->string($field, $default, $null);
         return $this;
     }
 
-    public function text($field, $null = "NOT NULL")
+    /**
+     * @param string $field
+     * @param string $null
+     * @return $this
+     */
+    public function text(string $field, string $null = "NOT NULL"): self
     {
         $this->query .= $this->driver->text($field, $null);
         return $this;
     }
 
-    public function created_at()
+    /**
+     * @return $this
+     */
+    public function created_at(): self
     {
         $this->query .= $this->driver->created_at();
         return $this;
     }
 
-    public function updated_at()
+    /**
+     * @return $this
+     */
+    public function updated_at(): self
     {
         $this->query .= $this->driver->updated_at();
         return $this;
     }
 
-    public function pk($field = null)
+    /**
+     * @param string|null $field
+     * @return $this
+     */
+    public function pk(?string $field = null): self
     {
         $this->query .= $this->driver->pk($field);
         return $this;
