@@ -19,7 +19,7 @@ class PgSQL
      */
     public function concat(string $fieldName, string $alias, string $orderBy): string
     {
-        return ", array_to_json(array_agg($fieldName ORDER BY $orderBy)) $alias  ";     
+        return ", array_to_string(array_agg($fieldName ORDER BY $orderBy), ',') $alias  ";     
     }
 
     /**
