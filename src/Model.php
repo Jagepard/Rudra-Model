@@ -14,10 +14,12 @@ use Rudra\Exceptions\RudraException;
 class Model
 {
     public string $table;
+    public string $directory;
 
-    public function __construct(string $table)
+    public function __construct(string $table, string $directory)
     {
-        $this->table = $table;
+        $this->table     = $table;
+        $this->directory = $directory;
     }
 
     /**
@@ -43,7 +45,7 @@ class Model
             $className = Repository::class;
         }
 
-        $newInstance = new $className($this->table);
+        $newInstance = new $className($this->table, $this->directory);
 
         if (method_exists($newInstance, $method)) {
             return $newInstance->$method(...$parameters);
