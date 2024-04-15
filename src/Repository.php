@@ -13,11 +13,13 @@ use Rudra\Validation\ValidationFacade as Validation;
 class Repository
 {
     public string $table;
+    public string $directory;
 
-    public function __construct(string $table)
+    public function __construct(string $table, string $directory)
     {
-        $this->table = $table;
-        $this->DSN   = Rudra::get("DSN");
+        $this->table     = $table;
+        $this->directory = $directory;
+        $this->DSN       = Rudra::get("DSN");
     }
 
     public function __call($method, array $parameters = [])
@@ -404,7 +406,7 @@ class Repository
         }
 
         $method = (strpos($params[0], '_') !== false) ? strstr($params[0], '_', true) : $params[0];
-        $data   = (!array_key_exists(1, $params)) ? $this->method() : $this->method(...$params[1]);
+        $data   = (!array_key_exists(1, $params)) ? $this->$method() : $this->$method(...$params[1]);
         file_put_contents($file, json_encode($data, JSON_UNESCAPED_UNICODE));
 
         return $data;

@@ -59,7 +59,7 @@ class Entity
             $className = Repository::class;
         }
 
-        $newInstance = new $className(static::$table);
+        $newInstance = new $className(static::$table, static::$directory);
 
         return $newInstance->$method(...$parameters);
     }
