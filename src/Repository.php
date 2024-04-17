@@ -164,19 +164,18 @@ class Repository
      * --------------------------------
      * Обновляет запись в базе данных
      *
-     * @param  string $id
-     * @param  array  $fields
+     * @param  array $fields
      * @return void
      */
-    public function update(string $id, array $fields)
+    public function update(array $fields)
     {
-        $table = $this->table;
+        $id = $fields['id'];
         unset($fields['id']);
         $stmtString   = $this->updateStmtString($fields);
         $fields['id'] = $id;
 
         $query = Rudra::get("DSN")->prepare("
-                UPDATE {$table} SET {$stmtString}
+                UPDATE {$this->table} SET {$stmtString}
                 WHERE id =:id");
 
         $query->execute($fields);
@@ -373,9 +372,7 @@ class Repository
                 $updateArr["id"]     = $validated["id"];
             }
 
-            self::update($updateArr);
-            $table = $this->table;
-
+            $this->update($updateArr);
             Redirect::run(ltrim($validated['redirect'], '/'));
         } else {
             dd(Validation::getAlerts($processed));
