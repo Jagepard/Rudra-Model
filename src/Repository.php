@@ -102,7 +102,7 @@ class Repository
         $table   = $this->table;
         $qString = QBFacade::select($fields)
             ->from($table)
-            ->orderBy("id ASC")
+            ->orderBy("$sort ASC")
             ->get();
 
         return self::qBuilder($qString);
