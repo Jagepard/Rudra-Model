@@ -96,13 +96,13 @@ class Repository
      * @param  string|null $fields
      * @return void
      */
-    public function getAll(string $sort = 'id', string $fields = null)
+    public function getAll(string $sort = 'id ASC', string $fields = null)
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
         $table   = $this->table;
         $qString = QBFacade::select($fields)
             ->from($table)
-            ->orderBy("$sort ASC")
+            ->orderBy($sort)
             ->get();
 
         return self::qBuilder($qString);
