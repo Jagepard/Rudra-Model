@@ -27,7 +27,7 @@ class MySQL
      */
     public function close(): string
     {
-        return ") ENGINE = InnoDB DEFAULT CHARSET = utf8mb4";
+        return ") ENGINE = InnoDB";
     }
 
     /**
