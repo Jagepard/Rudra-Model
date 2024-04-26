@@ -14,6 +14,7 @@ class Repository
 {
     public string $table;
     public string $directory;
+    private \PDO $DSN;
 
     public function __construct(string $table, string $directory)
     {
