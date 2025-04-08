@@ -72,9 +72,9 @@ class Repository
      * Находит элемент в базе данных по идентификатору
      *
      * @param  id
-     * @return void
+     * @return array|false
      */
-    public function find($id): array
+    public function find($id): array|false
     {
         $stmt = Rudra::get("DSN")->prepare("
                 SELECT * FROM {$this->table}
