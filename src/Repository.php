@@ -144,8 +144,8 @@ class Repository
         $stmt->execute([
             ":val" => $value,
         ]);
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
