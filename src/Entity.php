@@ -1,5 +1,12 @@
 <?php
 
+declare (strict_types = 1);
+
+/**
+ * @author  : Jagepard <jagepard@yandex.ru">
+ * @license https://mit-license.org/ MIT
+ */
+
 namespace Rudra\Model;
 
 class Entity
@@ -59,7 +66,7 @@ class Entity
             $className = Repository::class;
         }
 
-        $newInstance = new $className(static::$table, static::$directory);
+        $newInstance = new $className(static::$table);
 
         return $newInstance->$method(...$parameters);
     }

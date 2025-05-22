@@ -1,5 +1,12 @@
 <?php
 
+declare (strict_types = 1);
+
+/**
+ * @author  : Jagepard <jagepard@yandex.ru">
+ * @license https://mit-license.org/ MIT
+ */
+
 namespace Rudra\Model;
 
 use Rudra\Pagination;
@@ -13,14 +20,12 @@ use Rudra\Validation\ValidationFacade as Validation;
 class Repository
 {
     public string $table;
-    public string $directory;
     private \PDO $DSN;
 
-    public function __construct(string $table, string $directory)
+    public function __construct(string $table)
     {
-        $this->table     = $table;
-        $this->directory = $directory;
-        $this->DSN       = Rudra::get("DSN");
+        $this->table = $table;
+        $this->DSN   = Rudra::get("DSN");
     }
 
     public function __call($method, array $parameters = [])
@@ -39,7 +44,7 @@ class Repository
      */
     public function qBuilder($queryString, array $queryParams = []): array
     {
-        $stmt = Rudra::get("DSN")->prepare($queryString);
+        $stmt = $this->DSN->prepare($queryString);
         $stmt->execute($queryParams);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -76,7 +81,7 @@ class Repository
      */
     public function find($id): array|false
     {
-        $stmt = Rudra::get("DSN")->prepare("
+        $stmt = $this->DSN->prepare("
                 SELECT * FROM {$this->table}
                 WHERE id = :id
         ");
@@ -119,7 +124,7 @@ class Repository
     public function numRows()
     {
         $table = $this->table;
-        $count = Rudra::get("DSN")->query("SELECT COUNT(*) FROM {$table}");
+        $count = $this->DSN->query("SELECT COUNT(*) FROM {$table}");
 
         return $count->fetchColumn();
     }
@@ -136,7 +141,7 @@ class Repository
     public function findBy($field, $value)
     {
         $table = $this->table;
-        $stmt  = Rudra::get("DSN")->prepare("
+        $stmt  = $this->DSN->prepare("
                 SELECT * FROM {$table}
                 WHERE {$field} = :val
         ");
@@ -157,7 +162,7 @@ class Repository
      */
     public function lastInsertId()
     {
-        return Rudra::get("DSN")->lastInsertId();
+        return $this->DSN->lastInsertId();
     }
 
     /**
@@ -175,7 +180,7 @@ class Repository
         $stmtString   = $this->updateStmtString($fields);
         $fields['id'] = $id;
 
-        $query = Rudra::get("DSN")->prepare("
+        $query = $this->DSN->prepare("
                 UPDATE {$this->table} SET {$stmtString}
                 WHERE id =:id");
 
@@ -195,7 +200,7 @@ class Repository
         $table      = $this->table;
         $stmtString = $this->createStmtString($fields);
 
-        $query = Rudra::get("DSN")->prepare("
+        $query = $this->DSN->prepare("
                 INSERT INTO {$table} ({$stmtString[0]})
                 VALUES ({$stmtString[1]})");
 
@@ -213,7 +218,7 @@ class Repository
     public function delete($id)
     {
         $table = $this->table;
-        $query = Rudra::get("DSN")->prepare("DELETE FROM {$table} WHERE id = :id");
+        $query = $this->DSN->prepare("DELETE FROM {$table} WHERE id = :id");
         $query->execute([':id' => $id]);
     }
 
@@ -268,15 +273,15 @@ class Repository
     {
         $table = $this->table;
 
-        if (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
-            $query = Rudra::get("DSN")->query("SHOW COLUMNS FROM {$table}");
-        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
-            $query = Rudra::get("DSN")->query("SELECT column_name, data_type
+        if ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            $query = $this->DSN->query("SHOW COLUMNS FROM {$table}");
+        } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            $query = $this->DSN->query("SELECT column_name, data_type
                 FROM information_schema.columns 
                 WHERE table_name = '{$table}'"
             );
-        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
-                $query = Rudra::get("DSN")->query("PRAGMA table_info('{$table}')"
+        } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+                $query = $this->DSN->query("PRAGMA table_info('{$table}')"
             );
         }
 
@@ -294,15 +299,15 @@ class Repository
     public function getFields(string $fields = null)
     {
         if (!isset($fields)) {
-            if (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            if ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['Field'];
                 }
-            } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['column_name'];
                 }
-            } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+            } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['name'];
                 }
@@ -329,7 +334,7 @@ class Repository
         $table  = $this->table;
         $fields = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
 
-        $query = Rudra::get("DSN")->prepare("
+        $query = $this->DSN->prepare("
             SELECT {$fields} FROM {$table}
             WHERE {$column} LIKE :search
             ORDER BY id DESC
@@ -391,9 +396,9 @@ class Repository
      */
     public function qCache(array $params, $cacheTime = null)
     {
-        $directory = $this->directory . DIRECTORY_SEPARATOR . 'cache';
+        $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';       
         $file      = "$directory/$params[0].json";
-        $cacheTime = $cacheTime ?? Rudra::config()->get('cache.time');
+        $cacheTime = $cacheTime ?? config('cache.time', 'database');
 
         if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
