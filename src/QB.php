@@ -124,7 +124,7 @@ class QB
      * @param string $param
      * @return $this
      */
-    public function limit(string $param): self
+    public function limit($param): self
     {
         $this->query .= "LIMIT $param ";
         return $this;
@@ -138,11 +138,12 @@ class QB
      * @param string $param
      * @return $this
      */
-    public function offset(string $param): self
+    public function offset($param): self
     {
         $this->query .= "OFFSET $param ";
         return $this;
     }
+
 
     /**
      * To sort the rows of the result set, use the ORDER BY
