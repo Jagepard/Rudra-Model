@@ -50,15 +50,6 @@ class Repository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Retrieves all data, taking into account paging.
-     * -----------------------------------------------
-     * Получает все данные с учетом постраничного разбиения.
-     *
-     * @param  Pagination  $pagination
-     * @param  string|null $fields
-     * @return void
-     */
     public function getAllPerPage(Pagination $pagination, string $fields = null)
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
@@ -71,14 +62,6 @@ class Repository
         return $this->qBuilder($qString);
     }
 
-    /**
-     * Finds an element in the database by id
-     * --------------------------------------
-     * Находит элемент в базе данных по идентификатору
-     *
-     * @param  id
-     * @return array|false
-     */
     public function find($id): array|false
     {
         $stmt = $this->DSN->prepare("
@@ -93,15 +76,6 @@ class Repository
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Retrieves all items from the database according to the parameters
-     * -----------------------------------------------------------------
-     * Получает все элементы из базы данных  в соответствии с параметрами
-     *
-     * @param  string      $sort
-     * @param  string|null $fields
-     * @return void
-     */
     public function getAll(string $sort = 'id ASC', string $fields = null)
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
@@ -114,13 +88,6 @@ class Repository
         return self::qBuilder($qString);
     }
 
-    /**
-     * Gets the number of rows in a specific table
-     * -------------------------------------------
-     * Получает количество строк в определенной таблице
-     *
-     * @return void
-     */
     public function numRows()
     {
         $table = $this->table;
@@ -129,15 +96,6 @@ class Repository
         return $count->fetchColumn();
     }
 
-    /**
-     * Searches for an element by value in a given field
-     * -------------------------------------------------
-     * Ищет элемент по значению в заданном поле
-     *
-     * @param  $field
-     * @param  $value
-     * @return void
-     */
     public function findBy($field, $value)
     {
         $table = $this->table;
@@ -153,26 +111,11 @@ class Repository
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Returns the ID of the last inserted row or sequence value 
-     * ---------------------------------------------------------
-     * Возвращает ID последней вставленной строки или значение последовательности 
-     *
-     * @return void
-     */
     public function lastInsertId()
     {
         return $this->DSN->lastInsertId();
     }
 
-    /**
-     * Updates a record in the database
-     * --------------------------------
-     * Обновляет запись в базе данных
-     *
-     * @param  array $fields
-     * @return void
-     */
     public function update(array $fields)
     {
         $id = $fields['id'];
@@ -187,14 +130,6 @@ class Repository
         $query->execute($fields);
     }
 
-    /**
-     * Adds an entry to the database
-     * -----------------------------
-     * Добавляет запись в базу данных
-     *
-     * @param array $fields
-     * @return void
-     */
     public function create(array $fields)
     {
         $table      = $this->table;
@@ -207,14 +142,6 @@ class Repository
         $query->execute($fields);
     }
 
-    /**
-     * Deletes an entry in the database
-     * --------------------------------
-     * Удаляет запись в базе данных
-     *
-     * @param  $id
-     * @return void
-     */
     public function delete($id)
     {
         $table = $this->table;
@@ -224,8 +151,6 @@ class Repository
 
     /**
      * Prepares a row to update the database
-     * -------------------------------------
-     * Подготавливает строку для обновления базы данных
      *
      * @param  array $fields
      * @return void
@@ -243,8 +168,6 @@ class Repository
 
     /**
      * Prepares a row to be added to the database
-     * ------------------------------------------
-     * Подготавливает строку для добавления в базу данных
      *
      * @param  array $fields
      * @return void
@@ -262,13 +185,6 @@ class Repository
         return [implode(",", $insert), implode(",", $execute)];
     }
 
-    /**
-     * Gets the names of the columns in the table
-     * ------------------------------------------
-     * Получает название столбцов в таблице
-     *
-     * @return void
-     */
     public function getColumns()
     {
         $table = $this->table;
@@ -288,14 +204,6 @@ class Repository
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Gets the values of fields in a table
-     * ------------------------------------
-     * Получает значение полей в таблице
-     *
-     * @param  string|null $fields
-     * @return void
-     */
     public function getFields(string $fields = null)
     {
         if (!isset($fields)) {
@@ -319,16 +227,6 @@ class Repository
         return $fields;
     }
 
-    /**
-     * Searches the table for data that matches the parameters
-     * -------------------------------------------------------
-     * Ищет в таблице данные соответствующие параметрам
-     *
-     * @param  string      $search
-     * @param  string      $column
-     * @param  string|null $fields
-     * @return void
-     */
     public function search(string $search, string $column, string $fields = null)
     {
         $table  = $this->table;
@@ -349,10 +247,6 @@ class Repository
 
     /**
      * Helper method for writing a toggle
-     * ----------------------------------
-     * Вспомогательный метод для написания переключателя
-     *
-     * @return void
      */
     public function toggle()
     {
@@ -385,15 +279,6 @@ class Repository
         }
     }
 
-    /**
-     * Caches a database query
-     * -----------------------
-     * Кэширует запрос к базе данных
-     *
-     * @param  array  $params
-     * @param  $cacheTime
-     * @return void
-     */
     public function qCache(array $params, $cacheTime = null)
     {
         $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';       

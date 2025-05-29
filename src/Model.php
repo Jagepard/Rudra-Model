@@ -21,25 +21,11 @@ class Model
         $this->table = $table;
     }
 
-    /**
-     * Calls unavailable methods in the Repository namespace
-     * -------------------------------------------------------------------------
-     * Вызывает недоступные методы в пространстве имен репозитория.
-     *
-     * @param  $method
-     * @param array $parameters
-     * @return void
-     * @throws RudraException
-     */
     public function __call($method, array $parameters = [])
     {      
         $className = str_replace("Model", "Repository", get_called_class()) . "Repository";
 
-        /**
-         * If there is no Repository, then call the parent Repository
-         * ----------------------------------------------------------
-         * Если нет Репозитория, то вызываем родительский Репозиторий
-         */
+        // If there is no Repository, then call the parent Repository
         if (!class_exists($className)) {
             $className = Repository::class;
         }
