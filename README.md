@@ -1,11 +1,5 @@
-
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Jagepard/Rudra-Model/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Jagepard/Rudra-Model/?branch=master)
-[![Code Climate](https://codeclimate.com/github/Jagepard/Rudra-Model/badges/gpa.svg)](https://codeclimate.com/github/Jagepard/Rudra-Model)
+[![Maintainability](https://qlty.sh/badges/ca8bb591-ff66-41c3-8f18-4d4a93b3ee41/maintainability.svg)](https://qlty.sh/gh/Jagepard/projects/Rudra-Model)
 [![CodeFactor](https://www.codefactor.io/repository/github/jagepard/rudra-model/badge)](https://www.codefactor.io/repository/github/jagepard/rudra-model)
 -----
-[![Code Intelligence Status](https://scrutinizer-ci.com/g/Jagepard/Rudra-Model/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
-[![Latest Stable Version](https://poser.pugx.org/rudra/model/v/stable)](https://packagist.org/packages/rudra/model)
-[![Total Downloads](https://poser.pugx.org/rudra/model/downloads)](https://packagist.org/packages/rudra/model)
-![GitHub](https://img.shields.io/github/license/jagepard/Rudra-Model.svg)
 
 # Rudra-Model | [API](https://github.com/Jagepard/Rudra-Model/blob/master/docs.md "Documentation API")
