@@ -1,32 +1,33 @@
 {
-    "name"             : "rudra/model",
-    "description"      : "Rudra framework",
-    "type"             : "library",
-    "keywords"         : [
+    "name": "rudra/model",
+    "description": "Rudra framework",
+    "type": "library",
+    "keywords": [
         "rudra",
         "model"
     ],
-    "license"          : "MIT",
-    "authors"          : [
+    "license": "MIT",
+    "authors": [
         {
-            "name"    : "Jagepard",
-            "email"   : "jagepard@yandex.ru",
+            "name": "Jagepard",
+            "email": "jagepard@yandex.ru",
             "homepage": "https://jagepard.ru",
-            "role"    : "Developer"
+            "role": "Developer"
         }
     ],
-    "support"          : {
+    "support": {
         "email": "jagepard@yandex.ru",
-        "skype": "jagepard.ru"
+        "issues": "https://github.com/Jagepard/Rudra-Model/issues",    
+        "source": "https://github.com/Jagepard/Rudra-Model"    
     },
-    "require"          : {
-        "php"             : ">=7.4",
-        "rudra/container" : "9999999-dev",
-        "rudra/redirect"  : "dev-master",
-        "rudra/exception" : "dev-master",
-        "rudra/pagination": "dev-master",
-        "rudra/validation": "dev-master",
-        "rudra/docs"      : "dev-master",
+    "require": {
+        "php": ">=8.3",
+        "rudra/container" : "self.version",
+        "rudra/redirect"  : "self.version",
+        "rudra/exception" : "self.version",
+        "rudra/pagination": "self.version",
+        "rudra/validation": "self.version",
+        "rudra/docs"      : "self.version",
         "ext-pdo"         : "*"
     },
     "autoload"         : {
@@ -40,8 +41,15 @@
         }
     },
     "minimum-stability": "dev",
-    "config"           : {
+    "prefer-stable": true,
+    "config": {
         "optimize-autoloader": true,
-        "prefer-stable"      : true
+        "sort-packages": true,
+        "platform-check": false
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }
