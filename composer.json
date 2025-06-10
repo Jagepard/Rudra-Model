@@ -22,20 +22,20 @@
     },
     "require": {
         "php": ">=8.3",
-        "rudra/container" : "self.version",
-        "rudra/redirect"  : "self.version",
-        "rudra/exception" : "self.version",
+        "rudra/container": "self.version",
+        "rudra/redirect": "self.version",
+        "rudra/exception": "self.version",
         "rudra/pagination": "self.version",
         "rudra/validation": "self.version",
-        "rudra/docs"      : "self.version",
-        "ext-pdo"         : "*"
+        "rudra/docs": "self.version",
+        "ext-pdo": "*"
     },
-    "autoload"         : {
+    "autoload": {
         "psr-4": {
             "Rudra\\Model\\": "src/"
         }
     },
-    "autoload-dev"     : {
+    "autoload-dev": {
         "psr-4": {
             "Rudra\\Model\\Tests\\": "tests/"
         }
