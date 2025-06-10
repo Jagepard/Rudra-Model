@@ -10,27 +10,55 @@ declare (strict_types = 1);
 namespace Rudra\Model;
 
 use Rudra\Pagination;
-use Rudra\Container\Facades\Rudra;
-use Rudra\Container\Facades\Request;
-use Rudra\Container\Facades\Session;
-use Rudra\Exceptions\RudraException;
-use Rudra\Redirect\RedirectFacade as Redirect;
-use Rudra\Validation\ValidationFacade as Validation;
+use Rudra\Container\Rudra;
+use Rudra\Redirect\Redirect;
+use Rudra\Validation\Validation;
+use Rudra\Exceptions\LogicException;
 
 class Repository
 {
     public string $table;
-    private \PDO $DSN;
+    private Rudra $rudra;
+    private \PDO $dsn;
+    private QB $qb;
 
-    public function __construct(string $table)
+    public function __construct(string $table, ?\PDO $dsn = null)
     {
         $this->table = $table;
-        $this->DSN   = Rudra::get("DSN");
+        $this->rudra = Rudra::run();
+        $this->dsn   = $dsn ?? $this->rudra->get('DSN');
+        $this->qb    = new QB($this->dsn);
+
+        if (!$this->dsn instanceof \PDO) {
+            throw new LogicException('DSN must be an instance of PDO');
+        }
     }
 
     public function __call($method, array $parameters = [])
     {
-        throw new RudraException(sprintf('Method %s does not exists', $method));
+        throw new LogicException(sprintf('Method %s does not exists', $method));
+    }
+
+    private function getQB(): QB
+    {
+        if ($this->qb === null) {
+            $this->qb = new QB($this->dsn);
+        }
+
+        return $this->qb;
+    }
+
+    public function onDsn(\PDO $dsn): self
+    {
+        $this->dsn = $dsn;
+        $this->qb  = null;
+
+        return $this;
+    }
+
+    public function withDsn(\PDO $dsn): self
+    {
+        return new static($this->table, $dsn);
     }
 
     /**
@@ -44,7 +72,7 @@ class Repository
      */
     public function qBuilder($queryString, array $queryParams = []): array
     {
-        $stmt = $this->DSN->prepare($queryString);
+        $stmt = $this->dsn->prepare($queryString);
         $stmt->execute($queryParams);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -53,7 +81,7 @@ class Repository
     public function getAllPerPage(Pagination $pagination, string $fields = null)
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
-        $qString = QBFacade::select($fields)
+        $qString = $this->getQB()->select($fields)
             ->from($this->table)
             ->orderBy("id DESC")
             ->limit($pagination->getPerPage())->offset($pagination->getOffset())
@@ -64,7 +92,7 @@ class Repository
 
     public function find($id): array|false
     {
-        $stmt = $this->DSN->prepare("
+        $stmt = $this->dsn->prepare("
                 SELECT * FROM {$this->table}
                 WHERE id = :id
         ");
@@ -80,7 +108,7 @@ class Repository
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
         $table   = $this->table;
-        $qString = QBFacade::select($fields)
+        $qString = $this->getQB()->select($fields)
             ->from($table)
             ->orderBy($sort)
             ->get();
@@ -91,7 +119,7 @@ class Repository
     public function numRows()
     {
         $table = $this->table;
-        $count = $this->DSN->query("SELECT COUNT(*) FROM {$table}");
+        $count = $this->dsn->query("SELECT COUNT(*) FROM {$table}");
 
         return $count->fetchColumn();
     }
@@ -99,7 +127,7 @@ class Repository
     public function findBy($field, $value)
     {
         $table = $this->table;
-        $stmt  = $this->DSN->prepare("
+        $stmt  = $this->dsn->prepare("
                 SELECT * FROM {$table}
                 WHERE {$field} = :val
         ");
@@ -113,7 +141,7 @@ class Repository
 
     public function lastInsertId()
     {
-        return $this->DSN->lastInsertId();
+        return $this->dsn->lastInsertId();
     }
 
     public function update(array $fields)
@@ -123,7 +151,7 @@ class Repository
         $stmtString   = $this->updateStmtString($fields);
         $fields['id'] = $id;
 
-        $query = $this->DSN->prepare("
+        $query = $this->dsn->prepare("
                 UPDATE {$this->table} SET {$stmtString}
                 WHERE id =:id");
 
@@ -135,7 +163,7 @@ class Repository
         $table      = $this->table;
         $stmtString = $this->createStmtString($fields);
 
-        $query = $this->DSN->prepare("
+        $query = $this->dsn->prepare("
                 INSERT INTO {$table} ({$stmtString[0]})
                 VALUES ({$stmtString[1]})");
 
@@ -145,7 +173,7 @@ class Repository
     public function delete($id)
     {
         $table = $this->table;
-        $query = $this->DSN->prepare("DELETE FROM {$table} WHERE id = :id");
+        $query = $this->dsn->prepare("DELETE FROM {$table} WHERE id = :id");
         $query->execute([':id' => $id]);
     }
 
@@ -189,15 +217,15 @@ class Repository
     {
         $table = $this->table;
 
-        if ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
-            $query = $this->DSN->query("SHOW COLUMNS FROM {$table}");
-        } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
-            $query = $this->DSN->query("SELECT column_name, data_type
+        if ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            $query = $this->dsn->query("SHOW COLUMNS FROM {$table}");
+        } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            $query = $this->dsn->query("SELECT column_name, data_type
                 FROM information_schema.columns 
                 WHERE table_name = '{$table}'"
             );
-        } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
-                $query = $this->DSN->query("PRAGMA table_info('{$table}')"
+        } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+                $query = $this->dsn->query("PRAGMA table_info('{$table}')"
             );
         }
 
@@ -207,15 +235,15 @@ class Repository
     public function getFields(string $fields = null)
     {
         if (!isset($fields)) {
-            if ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            if ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['Field'];
                 }
-            } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['column_name'];
                 }
-            } elseif ($this->DSN->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+            } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['name'];
                 }
@@ -232,7 +260,7 @@ class Repository
         $table  = $this->table;
         $fields = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
 
-        $query = $this->DSN->prepare("
+        $query = $this->dsn->prepare("
             SELECT {$fields} FROM {$table}
             WHERE {$column} LIKE :search
             ORDER BY id DESC
@@ -246,19 +274,20 @@ class Repository
     }
 
     /**
+     * @deprecated
      * Helper method for writing a toggle
      */
     public function toggle()
     {
         $processed = [
-            'csrf_field' => Validation::sanitize(Request::post()->get("csrf_field"))->csrf(Session::get("csrf_token"))->run(),
-            'id'         => Validation::sanitize(Request::put()->get('id'))->run(),
-            'redirect'   => Validation::sanitize(Request::put()->get('redirect'))->run(),
+            'csrf_field' => $this->rudra->get(Validation::class)->sanitize($this->rudra->request()->post()->get("csrf_field"))->csrf($this->rudra->session()->get("csrf_token"))->run(),
+            'id'         => $this->rudra->get(Validation::class)->sanitize($this->rudra->request()->put()->get('id'))->run(),
+            'redirect'   => $this->rudra->get(Validation::class)->sanitize($this->rudra->request()->put()->get('redirect'))->run(),
         ];
 
-        $validated = Validation::getValidated($processed, ["csrf_field", "_method"]);
+        $validated = $this->rudra->get(Validation::class)->getValidated($processed, ["csrf_field", "_method"]);
 
-        if (Validation::approve($processed)) {
+        if ($this->rudra->get(Validation::class)->approve($processed)) {
             $fields    = ["id", "status", "updated_at"];
             $updateArr = [];
 
@@ -268,14 +297,14 @@ class Repository
                     continue;
                 }
 
-                $updateArr["status"] = (Request::put()->has("checkbox")) ? "1" : "0";
+                $updateArr["status"] = ($this->rudra->request()->put()->has("checkbox")) ? "1" : "0";
                 $updateArr["id"]     = $validated["id"];
             }
 
             $this->update($updateArr);
-            Redirect::run(ltrim($validated['redirect'], '/'));
+            $this->rudra->get(Redirect::class)->run(ltrim($validated['redirect'], '/'));
         } else {
-            dd(Validation::getAlerts($processed));
+            dd($this->rudra->get(Validation::class)->getAlerts($processed));
         }
     }
 

@@ -19,13 +19,13 @@ class QB
     private $driver;
     private string $query = '';
 
-    public function __construct()
+    public function __construct(\PDO $dsn)
     {
-        if (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+        if ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
             $this->driver = new MySQL;
-        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+        } elseif ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
             $this->driver = new PgSQL;
-        } elseif (Rudra::get("DSN")->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+        } elseif ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
             $this->driver = new SQLite;
         }
     }
