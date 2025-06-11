@@ -17,12 +17,12 @@ use Rudra\Exceptions\LogicException;
 
 class Repository
 {
-    public string $table;
+    public ?string $table;
     private Rudra $rudra;
     private \PDO $dsn;
     private QB $qb;
 
-    public function __construct(string $table, ?\PDO $dsn = null)
+    public function __construct(?string $table, ?\PDO $dsn = null)
     {
         $this->table = $table;
         $this->rudra = Rudra::run();
@@ -39,7 +39,7 @@ class Repository
         throw new LogicException(sprintf('Method %s does not exists', $method));
     }
 
-    private function getQB(): QB
+    public function qb(): QB
     {
         if ($this->qb === null) {
             $this->qb = new QB($this->dsn);
@@ -81,7 +81,7 @@ class Repository
     public function getAllPerPage(Pagination $pagination, string $fields = null)
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
-        $qString = $this->getQB()->select($fields)
+        $qString = $this->qb()->select($fields)
             ->from($this->table)
             ->orderBy("id DESC")
             ->limit($pagination->getPerPage())->offset($pagination->getOffset())
@@ -108,7 +108,7 @@ class Repository
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
         $table   = $this->table;
-        $qString = $this->getQB()->select($fields)
+        $qString = $this->qb()->select($fields)
             ->from($table)
             ->orderBy($sort)
             ->get();
