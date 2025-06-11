@@ -11,7 +11,7 @@ namespace Rudra\Model;
 
 class Entity
 {
-    public static string $table;
+    public static ?string $table = null;
 
     public static function __callStatic($method, array $parameters = [])
     {
