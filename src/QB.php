@@ -13,14 +13,17 @@ use Rudra\Model\Driver\MySQL;
 use Rudra\Model\Driver\PgSQL;
 use Rudra\Model\Driver\SQLite;
 use Rudra\Container\Facades\Rudra;
+use Rudra\Exceptions\LogicException;
 
 class QB
 {
     private $driver;
     private string $query = '';
 
-    public function __construct(\PDO $dsn)
+    public function __construct($dsn = null)
     {
+        $dsn = $dsn ?? Rudra::get('DSN') ?? throw new LogicException("DSN is mot installed");
+
         if ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
             $this->driver = new MySQL;
         } elseif ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {

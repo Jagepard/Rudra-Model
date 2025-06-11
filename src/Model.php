@@ -13,10 +13,9 @@ use Rudra\Exceptions\RudraException;
 
 class Model
 {
-    public string $table;
-    public string $directory;
+    public ?string $table;
 
-    public function __construct(string $table)
+    public function __construct(?string $table = null)
     {
         $this->table = $table;
     }

@@ -12,6 +12,7 @@ namespace Rudra\Model;
 use Rudra\Container\Traits\FacadeTrait;
 
 /**
+ * @deprecated
  * @method static select(?string $fields = '*')
  *
  * @see QB
