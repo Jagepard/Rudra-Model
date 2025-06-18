@@ -156,6 +156,7 @@ class Repository
                 WHERE id =:id");
 
         $query->execute($fields);
+        $this->clearCache();
     }
 
     public function create(array $fields)
@@ -168,6 +169,7 @@ class Repository
                 VALUES ({$stmtString[1]})");
 
         $query->execute($fields);
+        $this->clearCache();
     }
 
     public function delete($id)
@@ -175,6 +177,7 @@ class Repository
         $table = $this->table;
         $query = $this->dsn->prepare("DELETE FROM {$table} WHERE id = :id");
         $query->execute([':id' => $id]);
+        $this->clearCache();
     }
 
     /**
@@ -308,7 +311,7 @@ class Repository
         }
     }
 
-    public function qCache(array $params, $cacheTime = null)
+    public function cache(array $params, $cacheTime = null)
     {
         $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';       
         $file      = "$directory/$params[0].json";
@@ -327,5 +330,28 @@ class Repository
         file_put_contents($file, json_encode($data, JSON_UNESCAPED_UNICODE));
 
         return $data;
+    }
+
+    public function clearCache(string $type = 'database')
+    {
+        $baseDir = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+        
+        if (!in_array($type, ['database', 'view', 'all'])) {
+            return;
+        }
+
+        if ($type === 'all') {
+            $this->clearCache('database');
+            $this->clearCache('view');
+            return;
+        }
+
+        $directory = $baseDir . $type;
+
+        if (is_dir($directory)) {
+            foreach (glob("$directory/*.json") as $file) {
+                if (is_file($file)) unlink($file);
+            }
+        }
     }
 }
