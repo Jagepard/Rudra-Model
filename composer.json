@@ -22,12 +22,12 @@
     },
     "require": {
         "php": ">=8.3",
-        "rudra/container": "self.version",
-        "rudra/redirect": "self.version",
-        "rudra/exception": "self.version",
-        "rudra/pagination": "self.version",
-        "rudra/validation": "self.version",
-        "rudra/docs": "self.version",
+        "rudra/container": "v25.6",
+        "rudra/redirect": "v25.6",
+        "rudra/exception": "v25.6",
+        "rudra/pagination": "v25.6",
+        "rudra/validation": "v25.10",
+        "rudra/docs": "v25.6",
         "ext-pdo": "*"
     },
     "autoload": {
