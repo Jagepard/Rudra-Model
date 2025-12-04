@@ -404,21 +404,28 @@ class Repository
      * @param  string|null $fields
      * @return array 
      */
-    public function search(string $search, string $column, string $fields = null)
+    public function search(string $search, string $column, ?string $fields = null): array
     {
         $table  = $this->table;
-        $fields = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
+        $fields = $fields ?: implode(',', $this->getFields());
+        $driver = $this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        // Формируем выражение для приведения к строке
+        $searchExpr = match ($driver) {
+            'pgsql'  => "$column::TEXT",          // PostgreSQL
+            'mysql'  => "CAST($column AS CHAR)",  // MySQL
+            'sqlite' => "CAST($column AS TEXT)",  // SQLite
+            default  => "$column",                // fallback (если вдруг другая СУБД)
+        };
 
         $query = $this->dsn->prepare("
             SELECT {$fields} FROM {$table}
-            WHERE {$column} LIKE :search
+            WHERE {$searchExpr} LIKE :search
             ORDER BY id DESC
-            LIMIT 10");
+            LIMIT 10
+        ");
 
-        $query->execute([
-            ':search' => '%' . $search . '%',
-        ]);
-
+        $query->execute([':search' => "%{$search}%"]);
         return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
 
