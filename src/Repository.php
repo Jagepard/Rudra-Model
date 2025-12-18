@@ -487,7 +487,7 @@ class Repository
      */
     public function cache(array $params, $cacheTime = null)
     {
-        $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';       
+        $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';       
         $file      = "$directory/$params[0].json";
         $cacheTime = $cacheTime ?? config('cache.time', 'database');
 
@@ -520,7 +520,7 @@ class Repository
      */
     public function clearCache(string $type = 'database')
     {
-        $baseDir = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+        $baseDir = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
         
         if (!in_array($type, ['database', 'view', 'all'])) {
             return;
