@@ -47,6 +47,6 @@ class Schema
     public function execute(): bool
     {
         $sql = $this->qb->close()->get();
-        return Rudra::get("DSN")->prepare($sql)->execute();
+        return Rudra::get("connection")->prepare($sql)->execute();
     }
 }

@@ -21,26 +21,26 @@ class QB
     private string $query = '';
 
     /**
-     * Initializes the database driver based on the provided DSN or a default DSN from the container.
-     * If no DSN is provided and none is available in the container, a LogicException is thrown.
-     * The driver is selected based on the database type specified in the DSN's driver attribute.
+     * Initializes the database driver based on the provided connection or a default connection from the container.
+     * If no connection is provided and none is available in the container, a LogicException is thrown.
+     * The driver is selected based on the database type specified in the connection's driver attribute.
      * -------------------------
-     * Инициализирует драйвер базы данных на основе предоставленного DSN или DSN по умолчанию из контейнера.
-     * Если DSN не предоставлен и отсутствует в контейнере, выбрасывается исключение LogicException.
-     * Драйвер выбирается на основе типа базы данных, указанного в атрибуте драйвера DSN.
+     * Инициализирует драйвер базы данных на основе предоставленного connection или connection по умолчанию из контейнера.
+     * Если connection не предоставлен и отсутствует в контейнере, выбрасывается исключение LogicException.
+     * Драйвер выбирается на основе типа базы данных, указанного в атрибуте драйвера connection.
      * 
-     * @param $dsn
+     * @param $connection
      * @throws LogicException
      */
-    public function __construct($dsn = null)
+    public function __construct($connection = null)
     {
-        $dsn = $dsn ?? Rudra::get('DSN') ?? throw new LogicException("DSN is mot installed");
+        $connection = $connection ?? Rudra::get('connection') ?? throw new LogicException("connection is mot installed");
 
-        if ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+        if ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
             $this->driver = new MySQL;
-        } elseif ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+        } elseif ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
             $this->driver = new PgSQL;
-        } elseif ($dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+        } elseif ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
             $this->driver = new SQLite;
         }
     }

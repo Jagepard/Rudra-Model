@@ -19,32 +19,32 @@ class Repository
 {
     public ?string $table;
     private Rudra $rudra;
-    private \PDO $dsn;
+    private \PDO $connection;
     private QB $qb;
 
     /**
-     * Initializes the class with a table name, DSN (Data Source Name), and sets up dependencies.
-     * The DSN is either provided directly or retrieved from the Rudra container.
-     * If the DSN is not an instance of PDO, a LogicException is thrown.
+     * Initializes the class with a table name, connection, and sets up dependencies.
+     * The connection is either provided directly or retrieved from the Rudra container.
+     * If the connection is not an instance of PDO, a LogicException is thrown.
      * -------------------------
-     * Инициализирует класс с именем таблицы, DSN (Data Source Name) и настраивает зависимости.
-     * DSN может быть предоставлен напрямую или извлечен из контейнера Rudra.
-     * Если DSN не является экземпляром PDO, выбрасывается исключение LogicException.
+     * Инициализирует класс с именем таблицы, connection и настраивает зависимости.
+     * connection может быть предоставлен напрямую или извлечен из контейнера Rudra.
+     * Если connection не является экземпляром PDO, выбрасывается исключение LogicException.
      *
      * @param  string|null $table
-     * @param  \PDO|null $dsn
+     * @param  \PDO|null $connection
      * @return void
      * @throws LogicException
      */
-    public function __construct(?string $table, ?\PDO $dsn = null)
+    public function __construct(?string $table, ?\PDO $connection = null)
     {
         $this->table = $table;
         $this->rudra = Rudra::run();
-        $this->dsn   = $dsn ?? $this->rudra->get('DSN');
-        $this->qb    = new QB($this->dsn);
+        $this->connection = $connection ?? $this->rudra->get('connection');
+        $this->qb = new QB($this->connection);
 
-        if (!$this->dsn instanceof \PDO) {
-            throw new LogicException('DSN must be an instance of PDO');
+        if (!$this->connection instanceof \PDO) {
+            throw new LogicException('connection must be an instance of PDO');
         }
     }
 
@@ -67,11 +67,11 @@ class Repository
 
     /**
      * Returns an instance of the Query Builder (QB).
-     * If the QB instance is not yet initialized, it creates a new instance using the DSN.
+     * If the QB instance is not yet initialized, it creates a new instance using the connection.
      * This method implements lazy initialization to ensure the QB instance is created only when needed.
      * -------------------------
      * Возвращает экземпляр Query Builder (QB).
-     * Если экземпляр QB ещё не инициализирован, создаётся новый экземпляр с использованием DSN.
+     * Если экземпляр QB ещё не инициализирован, создаётся новый экземпляр с использованием connection.
      * Этот метод реализует ленивую инициализацию, чтобы гарантировать создание экземпляра QB только при необходимости.
      *
      * @return QB
@@ -79,45 +79,57 @@ class Repository
     public function qb(): QB
     {
         if ($this->qb === null) {
-            $this->qb = new QB($this->dsn);
+            $this->qb = new QB($this->connection);
         }
 
         return $this->qb;
     }
 
     /**
-     * Sets the DSN (Data Source Name) for the database connection and resets the Query Builder instance.
-     * This method allows changing the DSN dynamically and ensures that the Query Builder is re-initialized.
+     * Returns the current PDO instance used by the repository.
      * -------------------------
-     * Устанавливает DSN (Data Source Name) для подключения к базе данных и сбрасывает экземпляр Query Builder.
-     * Этот метод позволяет динамически изменять DSN и гарантирует повторную инициализацию Query Builder.
+     * Возвращает текущий экземпляр PDO, используемый репозиторием.
      *
-     * @param  \PDO $dsn
+     * @return \PDO
+     */
+    public function connection(): \PDO
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Sets the connection for the database connection and resets the Query Builder instance.
+     * This method allows changing the connection dynamically and ensures that the Query Builder is re-initialized.
+     * -------------------------
+     * Устанавливает connection для подключения к базе данных и сбрасывает экземпляр Query Builder.
+     * Этот метод позволяет динамически изменять connection и гарантирует повторную инициализацию Query Builder.
+     *
+     * @param  \PDO $connection
      * @return self
      */
-    public function onDsn(\PDO $dsn): self
+    public function onConnection(\PDO $connection): self
     {
-        $this->dsn = $dsn;
+        $this->connection = $connection;
         $this->qb  = null;
 
         return $this;
     }
 
     /**
-     * Creates and returns a new instance of the class with the specified DSN.
-     * This method allows changing the DSN while preserving the current table name.
+     * Creates and returns a new instance of the class with the specified connection.
+     * This method allows changing the connection while preserving the current table name.
      * It is useful for creating new instances with different database connections without modifying the original object.
      * -------------------------
-     * Создает и возвращает новый экземпляр класса с указанным DSN.
-     * Этот метод позволяет изменить DSN, сохраняя текущее имя таблицы.
+     * Создает и возвращает новый экземпляр класса с указанным connection.
+     * Этот метод позволяет изменить connection, сохраняя текущее имя таблицы.
      * Он полезен для создания новых экземпляров с разными подключениями к базе данных без изменения исходного объекта.
      *
-     * @param  \PDO $dsn
+     * @param  \PDO $connection
      * @return self
      */
-    public function withDsn(\PDO $dsn): self
+    public function withConnectionn(\PDO $connection): self
     {
-        return new static($this->table, $dsn);
+        return new static($this->table, $connection);
     }
 
     /**
@@ -133,7 +145,7 @@ class Repository
      */
     public function qBuilder($queryString, array $queryParams = []): array
     {
-        $stmt = $this->dsn->prepare($queryString);
+        $stmt = $this->connection->prepare($queryString);
         $stmt->execute($queryParams);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -162,7 +174,7 @@ class Repository
      */
     public function find($id): array|false
     {
-        $stmt = $this->dsn->prepare("
+        $stmt = $this->connection->prepare("
                 SELECT * FROM {$this->table}
                 WHERE id = :id
         ");
@@ -195,7 +207,7 @@ class Repository
     public function numRows()
     {
         $table = $this->table;
-        $count = $this->dsn->query("SELECT COUNT(*) FROM {$table}");
+        $count = $this->connection->query("SELECT COUNT(*) FROM {$table}");
 
         return $count->fetchColumn();
     }
@@ -208,7 +220,7 @@ class Repository
     public function findBy($field, $value)
     {
         $table = $this->table;
-        $stmt  = $this->dsn->prepare("
+        $stmt  = $this->connection->prepare("
                 SELECT * FROM {$table}
                 WHERE {$field} = :val
         ");
@@ -222,7 +234,7 @@ class Repository
 
     public function lastInsertId()
     {
-        return $this->dsn->lastInsertId();
+        return $this->connection->lastInsertId();
     }
 
     /**
@@ -236,7 +248,7 @@ class Repository
         $stmtString   = $this->updateStmtString($fields);
         $fields['id'] = $id;
 
-        $query = $this->dsn->prepare("
+        $query = $this->connection->prepare("
                 UPDATE {$this->table} SET {$stmtString}
                 WHERE id =:id");
 
@@ -253,7 +265,7 @@ class Repository
         $table      = $this->table;
         $stmtString = $this->createStmtString($fields);
 
-        $query = $this->dsn->prepare("
+        $query = $this->connection->prepare("
                 INSERT INTO {$table} ({$stmtString[0]})
                 VALUES ({$stmtString[1]})");
 
@@ -268,7 +280,7 @@ class Repository
     public function delete($id)
     {
         $table = $this->table;
-        $query = $this->dsn->prepare("DELETE FROM {$table} WHERE id = :id");
+        $query = $this->connection->prepare("DELETE FROM {$table} WHERE id = :id");
         $query->execute([':id' => $id]);
         $this->clearCache();
     }
@@ -340,15 +352,15 @@ class Repository
     {
         $table = $this->table;
 
-        if ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
-            $query = $this->dsn->query("SHOW COLUMNS FROM {$table}");
-        } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
-            $query = $this->dsn->query("SELECT column_name, data_type
+        if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            $query = $this->connection->query("SHOW COLUMNS FROM {$table}");
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            $query = $this->connection->query("SELECT column_name, data_type
                 FROM information_schema.columns 
                 WHERE table_name = '{$table}'"
             );
-        } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
-                $query = $this->dsn->query("PRAGMA table_info('{$table}')"
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+                $query = $this->connection->query("PRAGMA table_info('{$table}')"
             );
         }
 
@@ -370,15 +382,15 @@ class Repository
     public function getFields(string $fields = null)
     {
         if (!isset($fields)) {
-            if ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['Field'];
                 }
-            } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['column_name'];
                 }
-            } elseif ($this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+            } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
                 foreach ($this->getColumns() as $column) {
                     $fields[] = $column['name'];
                 }
@@ -408,7 +420,7 @@ class Repository
     {
         $table  = $this->table;
         $fields = $fields ?: implode(',', $this->getFields());
-        $driver = $this->dsn->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        $driver = $this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
         // Формируем выражение для приведения к строке
         $searchExpr = match ($driver) {
@@ -418,7 +430,7 @@ class Repository
             default  => "$column",                // fallback (если вдруг другая СУБД)
         };
 
-        $query = $this->dsn->prepare("
+        $query = $this->connection->prepare("
             SELECT {$fields} FROM {$table}
             WHERE {$searchExpr} LIKE :search
             ORDER BY id DESC
