@@ -34,7 +34,7 @@ class QB
      */
     public function __construct($connection = null)
     {
-        $connection = $connection ?? Rudra::get('connection') ?? throw new LogicException("connection is mot installed");
+        $connection = $connection ?? Rudra::get('connection') ?? throw new LogicException("connection is not installed");
 
         if ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
             $this->driver = new MySQL;
