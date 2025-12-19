@@ -224,20 +224,18 @@ class Repository
      * @return array|false
      * @throws LogicException if the field is not a valid column name
      */
-    public function findBy(string $field, $value): array|false
+    public function findBy($field, $value)
     {
-        $allowedFields = $this->getFields();
-        if (!in_array($field, $allowedFields, true)) {
-            throw new LogicException("Invalid field: {$field}");
-        }
-
         $table = $this->table;
         $stmt  = $this->connection->prepare("
-            SELECT * FROM {$table}
-            WHERE {$field} = :val
+                SELECT * FROM {$table}
+                WHERE {$field} = :val
         ");
 
-        $stmt->execute([':val' => $value]);
+        $stmt->execute([
+            ":val" => $value,
+        ]);
+        
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
@@ -432,21 +430,16 @@ class Repository
      */
     public function search(string $search, string $column, ?string $fields = null): array
     {
-        $allowedColumns = $this->getFields();
-        if (!in_array($column, $allowedColumns, true)) {
-            throw new LogicException("Invalid search column: {$column}");
-        }
-
         $table  = $this->table;
-        $fields = $fields ? implode(',', array_map('trim', explode(',', $fields))) : implode(',', $this->getFields());
+        $fields = $fields ?: implode(',', $this->getFields());
         $driver = $this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
         // Формируем выражение для приведения к строке
         $searchExpr = match ($driver) {
-            'pgsql'  => "{$column}::TEXT",          // PostgreSQL
-            'mysql'  => "CAST({$column} AS CHAR)",  // MySQL
-            'sqlite' => "CAST({$column} AS TEXT)",  // SQLite
-            default  => $column,                    // fallback
+            'pgsql'  => "$column::TEXT",          // PostgreSQL
+            'mysql'  => "CAST($column AS CHAR)",  // MySQL
+            'sqlite' => "CAST($column AS TEXT)",  // SQLite
+            default  => "$column",                // fallback (если вдруг другая СУБД)
         };
 
         $query = $this->connection->prepare("
