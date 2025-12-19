@@ -127,7 +127,7 @@ class Repository
      * @param  \PDO $connection
      * @return self
      */
-    public function withConnectionn(\PDO $connection): self
+    public function withConnection(\PDO $connection): self
     {
         return new static($this->table, $connection);
     }
@@ -189,9 +189,9 @@ class Repository
     /**
      * @param  string      $sort
      * @param  string|null $fields
-     * @return void
+     * @return array
      */
-    public function getAll(string $sort = 'id ASC', string $fields = null)
+    public function getAll(string $sort = 'id ASC', string $fields = null): array
     {
         $fields  = !isset($fields) ? implode(',', $this->getFields($fields)) : $fields;
         $table   = $this->table;
@@ -200,7 +200,7 @@ class Repository
             ->orderBy($sort)
             ->get();
 
-        return self::qBuilder($qString);
+        return $this->qBuilder($qString);
     }
 
 
@@ -213,22 +213,31 @@ class Repository
     }
 
     /**
-     * @param  $field
-     * @param  $value
-     * @return void
+     * Finds a single record by a specified field and value.
+     * The field name is validated against the actual table columns to prevent SQL injection.
+     * -------------------------
+     * Находит одну запись по указанному полю и значению.
+     * Имя поля проверяется по списку реальных колонок таблицы для предотвращения SQL-инъекций.
+     *
+     * @param string $field
+     * @param mixed  $value
+     * @return array|false
+     * @throws LogicException if the field is not a valid column name
      */
-    public function findBy($field, $value)
+    public function findBy(string $field, $value): array|false
     {
+        $allowedFields = $this->getFields();
+        if (!in_array($field, $allowedFields, true)) {
+            throw new LogicException("Invalid field: {$field}");
+        }
+
         $table = $this->table;
         $stmt  = $this->connection->prepare("
-                SELECT * FROM {$table}
-                WHERE {$field} = :val
+            SELECT * FROM {$table}
+            WHERE {$field} = :val
         ");
 
-        $stmt->execute([
-            ":val" => $value,
-        ]);
-        
+        $stmt->execute([':val' => $value]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
@@ -376,58 +385,68 @@ class Repository
      * Если конкретные поля не указаны, метод извлекает все имена столбцов в зависимости от типа базы данных.
      * В противном случае он разделяет предоставленную строку полей, разделённых запятыми, на массив.
      *
-     * @param  string|null $fields
+     * @param string|null $fields
      * @return array
      */
-    public function getFields(string $fields = null)
+    public function getFields(?string $fields = null): array
     {
-        if (!isset($fields)) {
-            if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
-                foreach ($this->getColumns() as $column) {
-                    $fields[] = $column['Field'];
-                }
-            } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
-                foreach ($this->getColumns() as $column) {
-                    $fields[] = $column['column_name'];
-                }
-            } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
-                foreach ($this->getColumns() as $column) {
-                    $fields[] = $column['name'];
-                }
-            }
-        } else {
-            $fields = explode(', ', $fields);
+        if ($fields !== null) {
+            // Разделяем по запятой и убираем пробелы вокруг каждого поля
+            return array_map('trim', explode(',', $fields));
         }
 
-        return $fields;
+        // Инициализируем как пустой массив — защита от null
+        $fieldList = [];
+
+        if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+            foreach ($this->getColumns() as $column) {
+                $fieldList[] = $column['Field'];
+            }
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+            foreach ($this->getColumns() as $column) {
+                $fieldList[] = $column['column_name'];
+            }
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+            foreach ($this->getColumns() as $column) {
+                $fieldList[] = $column['name'];
+            }
+        }
+
+        return $fieldList;
     }
 
     /**
      * Searches for records in the database based on a search term and column.
-     * The method prepares and executes a query to retrieve records where the specified column matches the search term.
+     * The column name is validated against the actual table columns to prevent SQL injection.
      * Results are ordered by ID in descending order and limited to 10 records.
      * -------------------------
      * Выполняет поиск записей в базе данных на основе поискового запроса и указанного столбца.
-     * Метод подготавливает и выполняет запрос для получения записей, где указанный столбец соответствует поисковому запросу.
+     * Имя столбца проверяется по списку реальных колонок таблицы для предотвращения SQL-инъекций.
      * Результаты сортируются по ID в порядке убывания и ограничиваются 10 записями.
      *
-     * @param  string $search
-     * @param  string $column
-     * @param  string|null $fields
-     * @return array 
+     * @param string      $search
+     * @param string      $column
+     * @param string|null $fields
+     * @return array
+     * @throws LogicException if the column is not a valid column name
      */
     public function search(string $search, string $column, ?string $fields = null): array
     {
+        $allowedColumns = $this->getFields();
+        if (!in_array($column, $allowedColumns, true)) {
+            throw new LogicException("Invalid search column: {$column}");
+        }
+
         $table  = $this->table;
-        $fields = $fields ?: implode(',', $this->getFields());
+        $fields = $fields ? implode(',', array_map('trim', explode(',', $fields))) : implode(',', $this->getFields());
         $driver = $this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
         // Формируем выражение для приведения к строке
         $searchExpr = match ($driver) {
-            'pgsql'  => "$column::TEXT",          // PostgreSQL
-            'mysql'  => "CAST($column AS CHAR)",  // MySQL
-            'sqlite' => "CAST($column AS TEXT)",  // SQLite
-            default  => "$column",                // fallback (если вдруг другая СУБД)
+            'pgsql'  => "{$column}::TEXT",          // PostgreSQL
+            'mysql'  => "CAST({$column} AS CHAR)",  // MySQL
+            'sqlite' => "CAST({$column} AS TEXT)",  // SQLite
+            default  => $column,                    // fallback
         };
 
         $query = $this->connection->prepare("
@@ -439,49 +458,6 @@ class Repository
 
         $query->execute([':search' => "%{$search}%"]);
         return $query->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * @deprecated
-     * Helper method for writing a toggle.
-     * This method processes a toggle request, validates input data, updates the status of a record,
-     * and redirects to the specified URL.
-     * -------------------------
-     * Вспомогательный метод для обработки переключения (toggle).
-     * Этот метод обрабатывает запрос на переключение, проверяет входные данные, обновляет статус записи
-     * и выполняет перенаправление на указанный URL.
-     *
-     * @return void
-     */
-    public function toggle()
-    {
-        $processed = [
-            'csrf_field' => $this->rudra->get(Validation::class)->sanitize($this->rudra->request()->post()->get("csrf_field"))->csrf($this->rudra->session()->get("csrf_token"))->run(),
-            'id'         => $this->rudra->get(Validation::class)->sanitize($this->rudra->request()->put()->get('id'))->run(),
-            'redirect'   => $this->rudra->get(Validation::class)->sanitize($this->rudra->request()->put()->get('redirect'))->run(),
-        ];
-
-        $validated = $this->rudra->get(Validation::class)->getValidated($processed, ["csrf_field", "_method"]);
-
-        if ($this->rudra->get(Validation::class)->approve($processed)) {
-            $fields    = ["id", "status", "updated_at"];
-            $updateArr = [];
-
-            foreach ($fields as $field) {
-                if (($field === "updated_at")) {
-                    $updateArr[$field] = date('Y-m-d H:i:s');
-                    continue;
-                }
-
-                $updateArr["status"] = ($this->rudra->request()->put()->has("checkbox")) ? "1" : "0";
-                $updateArr["id"]     = $validated["id"];
-            }
-
-            $this->update($updateArr);
-            $this->rudra->get(Redirect::class)->run(ltrim($validated['redirect'], '/'));
-        } else {
-            dd($this->rudra->get(Validation::class)->getAlerts($processed));
-        }
     }
 
     /**
@@ -499,7 +475,7 @@ class Repository
      */
     public function cache(array $params, $cacheTime = null)
     {
-        $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';       
+        $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';     
         $file      = "$directory/$params[0].json";
         $cacheTime = $cacheTime ?? config('cache.time', 'database');
 
@@ -520,35 +496,48 @@ class Repository
 
     /**
      * Clears cached files of a specified type or all types.
-     * The method removes JSON cache files from the 'database' or 'view' directories, 
-     * or clears both directories if 'all' is specified.
+     * If a cache key is provided, only that specific cache file is deleted.
      * -------------------------
      * Очищает кэшированные файлы указанного типа или всех типов.
-     * Метод удаляет JSON-файлы кэша из директорий 'database' или 'view',
-     * или очищает обе директории, если указано значение 'all'.
+     * Если указан ключ кэша, удаляется только этот конкретный файл.
      *
-     * @param  string $type
+     * @param string $type  Тип кэша: 'database', 'templates', 'twig', 'routes' или 'all'
+     * @param string|null $key  Имя кэш-файла (без .json). Если null — очистить всю папку.
      * @return void
      */
-    public function clearCache(string $type = 'database')
+    public function clearCache(string $type = 'database', ?string $key = null): void
     {
         $baseDir = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
-        
-        if (!in_array($type, ['database', 'view', 'all'])) {
+
+        if ($type === 'all') {
+            $this->clearCache('database', $key);
+            $this->clearCache('templates', $key);
+            $this->clearCache('twig', $key);
+            $this->clearCache('routes', $key);
             return;
         }
 
-        if ($type === 'all') {
-            $this->clearCache('database');
-            $this->clearCache('view');
+        if (!in_array($type, ['database', 'templates', 'twig', 'routes'], true)) {
             return;
         }
 
         $directory = $baseDir . $type;
 
+        if ($key !== null) {
+            // Удаляем один файл
+            $file = $directory . DIRECTORY_SEPARATOR . $key . '.json';
+            if (is_file($file)) {
+                unlink($file);
+            }
+            return;
+        }
+
+        // Удаляем все файлы в директории
         if (is_dir($directory)) {
             foreach (glob("$directory/*.json") as $file) {
-                if (is_file($file)) unlink($file);
+                if (is_file($file)) {
+                    unlink($file);
+                }
             }
         }
     }
