@@ -21,7 +21,7 @@
         "source": "https://github.com/Jagepard/Rudra-Model"    
     },
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "rudra/container": "self.version",
         "rudra/redirect": "self.version",
         "rudra/exception": "self.version",

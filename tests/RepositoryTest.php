@@ -11,7 +11,7 @@
  * phpunit src/tests/ContainerTest --coverage-html src/tests/coverage-html
  */
 
-namespace Rudra\Tests;
+namespace Rudra\Model\Tests;
 
 use PDO;
 use PDOStatement;

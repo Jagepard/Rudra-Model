@@ -15,22 +15,12 @@ class Entity
 {
     public static ?string $table = null;
 
-    /**
-     * @param  $method
-     * @param  array  $parameters
-     * @return void
-     */
-    public static function __callStatic($method, array $parameters = [])
+    public static function __callStatic(string $method, array $parameters = []): mixed
     {
         return self::callMethod($method, $parameters);
     }
 
-    /**
-     * @param  $method
-     * @param  array  $parameters
-     * @return void
-     */
-    public function __call($method, array $parameters = [])
+    public function __call(string $method, array $parameters = []): mixed
     {
         return self::callMethod($method, $parameters);
     }
@@ -40,17 +30,8 @@ class Entity
      * The method first attempts to call the method on the Model class associated with the Entity.
      * If the Model does not exist, it falls back to the Repository class.
      * If the Repository does not exist, it defaults to the parent Repository class.
-     * -------------------------
-     * Динамически вызывает метод в соответствующем классе Model, Repository или родительском Repository.
-     * Метод сначала пытается вызвать метод в классе Model, связанном с Entity.
-     * Если Model не существует, используется класс Repository.
-     * Если Repository не существует, используется родительский класс Repository.
-     *
-     * @param  $method
-     * @param  array  $parameters
-     * @return void
      */
-    protected static function callMethod($method, array $parameters)
+    protected static function callMethod(string $method, array $parameters): mixed
     {
         $className = str_replace("Entity", "Model", get_called_class());
 

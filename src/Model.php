@@ -17,9 +17,6 @@ class Model
 {
     public ?string $table;
 
-    /**
-     * @param  string|null $table
-     */
     public function __construct(?string $table = null)
     {
         $this->table = $table;
@@ -31,19 +28,10 @@ class Model
      * If the Repository does not exist, it falls back to the parent Repository class.
      * If the method exists in the resolved Repository, it is invoked with the provided parameters.
      * Otherwise, an exception is thrown.
-     * -------------------------
-     * Обрабатывает вызовы неопределённых методов, делегируя их соответствующему классу Repository.
-     * Метод динамически определяет класс Repository, связанный с Model.
-     * Если Repository не существует, используется родительский класс Repository.
-     * Если метод существует в разрешённом Repository, он вызывается с предоставленными параметрами.
-     * В противном случае выбрасывается исключение.
      *
-     * @param  $method
-     * @param  array  $parameters
-     * @return void
      * @throws RudraException 
      */
-    public function __call($method, array $parameters = [])
+    public function __call(string $method, array $parameters = []): mixed
     {      
         $className = str_replace("Model", "Repository", get_called_class()) . "Repository";
 
