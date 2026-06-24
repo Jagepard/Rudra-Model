@@ -27,9 +27,10 @@ class QB
      * If no connection is provided and none is available in the container, a LogicException is thrown.
      * The driver is selected based on the database type specified in the connection's driver attribute.
      * 
+     * @param mixed $connection DO NOT TYPE HINT - causes premature PDO resolution by IoC container
      * @throws LogicException
      */
-    public function __construct(?\PDO $connection = null)
+    public function __construct($connection = null)
     {
         $connection = $connection ?? Rudra::get('connection') ?? throw new LogicException("connection is not installed");
 
