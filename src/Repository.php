@@ -225,7 +225,7 @@ class Repository
     {
         $stmtFields = [];
 
-        foreach ($fields as $key => $data) {
+        foreach (array_keys($fields) as $key) {
             $stmtFields[] = "{$key}=:{$key}";
         }
 
@@ -238,14 +238,14 @@ class Repository
      * - A list of column names.
      * - A list of placeholders (prefixed with colons) for parameter binding.
      * These strings can be directly used in the SQL INSERT query.
-     */
+        */
     protected static function createStmtString(array $fields): array
     {
         $insert  = [];
         $execute = [];
 
-        foreach ($fields as $key => $data) {
-            $insert[]  = "{$key}";
+        foreach (array_keys($fields) as $key) {
+            $insert[]  = $key;
             $execute[] = ":{$key}";
         }
 
