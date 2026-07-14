@@ -13,7 +13,10 @@ namespace Rudra\Model;
 
 use Rudra\Exceptions\RudraException;
 
-class Model
+/**
+ * @mixin \Rudra\Model\Repository
+ */
+abstract class Model
 {
     public ?string $table;
 
