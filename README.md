@@ -81,13 +81,13 @@ Define your database schema using the Query Builder.
 use Rudra\Model\Schema;
 
 Schema::create('users', function ($table) {
-    $table->integer('id', '', true) // auto-increment
+    $table->integer('id', autoincrement: true)
           ->string('name')
           ->string('email')
           ->text('bio', 'NULL')
-          ->created_at()
-          ->updated_at()
-          ->pk('id');
+          ->createdAt()
+          ->updatedAt()
+          ->primaryKey('id');
 })->execute();
 ```
 ### 5. Simple File Caching

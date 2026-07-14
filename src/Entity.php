@@ -11,7 +11,10 @@
 
 namespace Rudra\Model;
 
-class Entity
+/**
+ * @mixin \Rudra\Model\Repository
+ */
+abstract class Entity
 {
     public static ?string $table = null;
 

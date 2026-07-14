@@ -20,7 +20,6 @@ class RepositoryTest extends TestCase
 {
     protected function setUp(): void
     {
-
     }
 
     public function testGetAllReturnsExpectedData()

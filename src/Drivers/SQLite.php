@@ -9,50 +9,60 @@
  * @license https://mozilla.org/MPL/2.0/  MPL-2.0
  */
 
-namespace Rudra\Model\Driver;
+namespace Rudra\Model\Drivers;
 
-class SQLite
+use Rudra\Model\Interfaces\SqlDialectInterface;
+
+class SQLite implements SqlDialectInterface
 {
-    public function concat(string $fieldName, string $alias, ?string $orderBy): string
+    #[\Override]
+    public function groupConcat(string $fieldName, string $alias, ?string $orderBy): string
     {
         return ", GROUP_CONCAT($fieldName,';') $alias  ";  
     }
 
+    #[\Override]
     public function close(): string
     {
         return ")";
     }
 
-    public function integer(string $field, string $default = "", bool $pk = false, string $null = "NOT NULL"): string
+    #[\Override]
+    public function integer(string $field, string $default = "", bool $autoincrement = false, string $null = "NOT NULL"): string
     {
-        if ($pk) {
+        if ($autoincrement) {
             return "$field INTEGER PRIMARY KEY";
         }
 
         return ", $field INTEGER $null $default";
     }
 
+    #[\Override]
     public function string(string $field, string $default = "", string $null = "NOT NULL"): string
     {
         return ", $field TEXT $null $default";
     }
 
+    #[\Override]
     public function text(string $field, string $null = "NOT NULL"): string
     {
         return ", $field TEXT $null";
     }
 
-    public function created_at(): string
+    #[\Override]
+    public function createdAt(): string
     {
         return ", created_at TEXT DEFAULT CURRENT_TIMESTAMP";
     }
 
-    public function updated_at(): string
+    #[\Override]
+    public function updatedAt(): string
     {
         return ", updated_at TEXT DEFAULT CURRENT_TIMESTAMP";
     }
 
-    public function pk(string $field): string
+    #[\Override]
+    public function primaryKey(string $field): string
     {
         return "";
     }

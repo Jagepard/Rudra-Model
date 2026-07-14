@@ -9,20 +9,25 @@
  * @license https://mozilla.org/MPL/2.0/  MPL-2.0
  */
 
-namespace Rudra\Model\Driver;
+namespace Rudra\Model\Drivers;
 
-class MySQL
+use Rudra\Model\Interfaces\SqlDialectInterface;
+
+class MySQL implements SqlDialectInterface
 {
-    public function concat(string $fieldName, string $alias, ?string $orderBy): string
+    #[\Override]
+    public function groupConcat(string $fieldName, string $alias, ?string $orderBy): string
     {
         return ", GROUP_CONCAT($fieldName ORDER BY $orderBy SEPARATOR ';') as $alias  ";  
     }
 
+    #[\Override]
     public function close(): string
     {
         return ") ENGINE = InnoDB";
     }
 
+    #[\Override]
     public function integer(string $field, string $default = "", bool $autoincrement = false, string $null = "NOT NULL"): string
     {
         if ($autoincrement) {
@@ -32,27 +37,31 @@ class MySQL
         return ", `$field` INT $null $default";
     }
 
+    #[\Override]
     public function string(string $field, string $default = "", string $null = "NOT NULL"): string
     {
         return ", `$field` VARCHAR(255) $null $default";
     }
 
+    #[\Override]
     public function text(string $field, string $null = "NOT NULL"): string
     {
         return ", `$field` text $null";
     }
 
-    public function created_at(): string
+    #[\Override]
+    public function createdAt(): string
     {
         return ", `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
     }
 
-    public function updated_at(): string
+    #[\Override]
+    public function updatedAt(): string
     {
         return ", `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
     }
 
-    public function pk(string $field): string
+    public function primaryKey(string $field): string
     {
         return ", PRIMARY KEY (`$field`)";
     }

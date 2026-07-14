@@ -1,0 +1,194 @@
+<?php declare(strict_types=1);
+
+/**
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * @author  Korotkov Danila (Jagepard) <jagepard@yandex.ru>
+ * @license https://mozilla.org/MPL/2.0/  MPL-2.0
+ */
+
+namespace Rudra\Model\Traits;
+
+use Rudra\Pagination;
+
+trait CrudTrait
+{
+    public function getAllPerPage(Pagination $pagination, ?string $fields = null): array
+    {
+        $fields  = $fields ?? implode(',', $this->getFields());
+        $qString = $this->qb()->select($fields)
+            ->from($this->table)
+            ->orderBy("id DESC")
+            ->limit($pagination->getPerPage())->offset($pagination->getOffset())
+            ->get();
+
+        return $this->qBuilder($qString);
+    }
+
+    public function getAll(string $sort = 'id ASC', ?string $fields = null): array
+    {
+        $fields  = $fields ?? implode(',', $this->getFields());
+        $table   = $this->table;
+        $qString = $this->qb()->select($fields)
+            ->from($table)
+            ->orderBy($sort)
+            ->get();
+
+        return $this->qBuilder($qString);
+    }
+
+    public function numRows(): int
+    {
+        $table = $this->table;
+        $count = $this->connection->query("SELECT COUNT(*) FROM {$table}");
+
+        return (int)$count->fetchColumn();
+    }
+
+    /**
+     * Finds a single record by a specified field and value.
+     * 
+     * WARNING: The $field parameter is inserted directly into the SQL query. 
+     * It is the developer's responsibility to ensure the field name is valid 
+     * and sanitized to prevent SQL injection. Do not pass raw user input here.
+     */
+    public function findBy(string $field, mixed $value): array|false
+    {
+        $table = $this->table;
+        $stmt  = $this->connection->prepare("
+                SELECT * FROM {$table}
+                WHERE {$field} = :val
+        ");
+
+        $stmt->execute([
+            ":val" => $value,
+        ]);
+        
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function lastInsertId(): string
+    {
+        return $this->connection->lastInsertId();
+    }
+
+    /**
+     * Searches for records in the database based on a search term and column.
+     * 
+     * WARNING: The $column parameter is inserted directly into the SQL query. 
+     * Ensure it is sanitized to prevent SQL injection.
+     * Results are ordered by ID in descending order and limited to 10 records.
+     */
+    public function search(string $search, string $column, ?string $fields = null): array
+    {
+        $table  = $this->table;
+        $fields = $fields ?: implode(',', $this->getFields());
+        $driver = $this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        // Form an expression for casting to string
+        $searchExpr = match ($driver) {
+            'pgsql'  => "$column::TEXT",          // PostgreSQL
+            'mysql'  => "CAST($column AS CHAR)",  // MySQL
+            'sqlite' => "CAST($column AS TEXT)",  // SQLite
+            default  => "$column",                // fallback (If suddenly another DBMS)
+        };
+
+        $query = $this->connection->prepare("
+            SELECT {$fields} FROM {$table}
+            WHERE {$searchExpr} LIKE :search
+            ORDER BY id DESC
+            LIMIT 10
+        ");
+
+        $query->execute([':search' => "%{$search}%"]);
+        return $query->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function find(int|string $id): array|false
+    {
+        $stmt = $this->connection->prepare("
+                SELECT * FROM {$this->table}
+                WHERE id = :id
+        ");
+
+        $stmt->execute([
+            ':id' => $id,
+        ]);
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function update(array $fields): void
+    {
+        $id = $fields['id'];
+        unset($fields['id']);
+        $stmtString   = $this->updateStmtString($fields);
+        $fields['id'] = $id;
+
+        $query = $this->connection->prepare("
+                UPDATE {$this->table} SET {$stmtString}
+                WHERE id =:id");
+
+        $query->execute($fields);
+        $this->clearCache();
+    }
+
+    public function create(array $fields): void
+    {
+        $table      = $this->table;
+        $stmtString = $this->createStmtString($fields);
+
+        $query = $this->connection->prepare("
+                INSERT INTO {$table} ({$stmtString[0]})
+                VALUES ({$stmtString[1]})");
+
+        $query->execute($fields);
+        $this->clearCache();
+    }
+
+    public function delete(int|string $id): void
+    {
+        $table = $this->table;
+        $query = $this->connection->prepare("DELETE FROM {$table} WHERE id = :id");
+        $query->execute([':id' => $id]);
+        $this->clearCache();
+    }
+
+    /**
+     * Generates a string of fields and placeholders for an SQL UPDATE statement.
+     * The method takes an array of fields and constructs a comma-separated list of "key=:key" pairs.
+     * This string can be directly used in the SET clause of an SQL UPDATE query.
+     */
+    protected static function updateStmtString(array $fields): string
+    {
+        $stmtFields = [];
+
+        foreach (array_keys($fields) as $key) {
+            $stmtFields[] = "{$key}=:{$key}";
+        }
+
+        return implode(",", $stmtFields);
+    }
+
+    /**
+     * Generates two strings for an SQL INSERT statement: one for column names and one for placeholders.
+     * The method takes an array of fields and constructs two comma-separated lists:
+     * - A list of column names.
+     * - A list of placeholders (prefixed with colons) for parameter binding.
+     * These strings can be directly used in the SQL INSERT query.
+     */
+    protected static function createStmtString(array $fields): array
+    {
+        $insert  = [];
+        $execute = [];
+
+        foreach (array_keys($fields) as $key) {
+            $insert[]  = $key;
+            $execute[] = ":{$key}";
+        }
+
+        return [implode(",", $insert), implode(",", $execute)];
+    }
+}

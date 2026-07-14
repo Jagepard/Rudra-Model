@@ -11,9 +11,9 @@
 
 namespace Rudra\Model;
 
-use Rudra\Model\Driver\MySQL;
-use Rudra\Model\Driver\PgSQL;
-use Rudra\Model\Driver\SQLite;
+use Rudra\Model\Drivers\MySQL;
+use Rudra\Model\Drivers\PgSQL;
+use Rudra\Model\Drivers\SQLite;
 use Rudra\Container\Facades\Rudra;
 use Rudra\Exceptions\LogicException;
 
@@ -49,9 +49,9 @@ class QB
         return $this;
     }
 
-    public function concat(string $fieldName, string $alias, ?string $orderBy = null): self
+    public function groupConcat(string $fieldName, string $alias, ?string $orderBy = null): self
     {
-        $this->query .= $this->driver->concat($fieldName, $alias, $orderBy);
+        $this->query .= $this->driver->groupConcat($fieldName, $alias, $orderBy);
         return $this;
     }
 
@@ -153,21 +153,21 @@ class QB
         return $this;
     }
 
-    public function created_at(): self
+    public function createdAt(): self
     {
-        $this->query .= $this->driver->created_at();
+        $this->query .= $this->driver->createdAt();
         return $this;
     }
 
-    public function updated_at(): self
+    public function updatedAt(): self
     {
-        $this->query .= $this->driver->updated_at();
+        $this->query .= $this->driver->updatedAt();
         return $this;
     }
 
-    public function pk(?string $field = null): self
+    public function primaryKey(?string $field = null): self
     {
-        $this->query .= $this->driver->pk($field);
+        $this->query .= $this->driver->primaryKey($field);
         return $this;
     }
 }
