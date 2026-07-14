@@ -16,7 +16,7 @@ use Rudra\Exceptions\RudraException;
 /**
  * @mixin \Rudra\Model\Repository
  */
-abstract class Model
+class Model
 {
     public ?string $table;
 
