@@ -16,10 +16,10 @@ use Rudra\Container\Facades\Rudra;
 class Schema
 {
     private QB $qb;
+    private string $table;
 
     /**
      * Creates a new Schema instance and defines the table structure using a callback function.
-     * The callback function is used to configure the table schema via the Query Builder.
      */
     public static function create(string $table, callable $callback): self
     {
@@ -27,16 +27,36 @@ class Schema
         $callback($qb);
         $self = new self();
         $self->qb = $qb;
+        $self->table = $table;
         return $self;
     }
 
     /**
-     * Executes the schema creation by preparing and running the SQL query.
-     * The SQL query is generated using the Query Builder and executed on the database connection.
+     * Checks if a table exists in the database.
+     */
+    public static function hasTable(string $table): bool
+    {
+        try {
+            Rudra::get("connection")->query("SELECT 1 FROM `$table` LIMIT 1");
+            return true;
+        } catch (\PDOException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Executes the schema creation.
+     * Throws an exception if the table already exists to prevent silent masking of DB state.
      */
     public function execute(): bool
     {
+        $connection = Rudra::get("connection");
+
+        if (isset($this->table) && self::hasTable($this->table)) {
+            throw new \RuntimeException("Table '{$this->table}' already exists in DB");
+        }
+
         $sql = $this->qb->close()->get();
-        return Rudra::get("connection")->prepare($sql)->execute();
+        return $connection->prepare($sql)->execute();
     }
 }
