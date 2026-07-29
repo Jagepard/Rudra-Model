@@ -13,7 +13,7 @@ namespace Rudra\Model\Interfaces;
 
 interface SqlDialectInterface
 {
-    public function groupConcat(string $fieldName, string $alias, ?string $orderBy): string;
+    public function groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct = true): string;
     public function close(): string;
     public function integer(string $field, string $default = "", bool $autoincrement = false, string $null = "NOT NULL"): string;
     public function string(string $field, string $default = "", string $null = "NOT NULL"): string;

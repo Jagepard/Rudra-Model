@@ -16,9 +16,10 @@ use Rudra\Model\Interfaces\SqlDialectInterface;
 class SQLite implements SqlDialectInterface
 {
     #[\Override]
-    public function groupConcat(string $fieldName, string $alias, ?string $orderBy): string
+    public function groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct = true): string
     {
-        return ", GROUP_CONCAT($fieldName,';') $alias  ";  
+        $distinctStr = $distinct ? 'DISTINCT ' : '';
+        return ", GROUP_CONCAT({$distinctStr}$fieldName, ';') $alias";
     }
 
     #[\Override]
