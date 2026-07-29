@@ -16,9 +16,10 @@ use Rudra\Model\Interfaces\SqlDialectInterface;
 class MySQL implements SqlDialectInterface
 {
     #[\Override]
-    public function groupConcat(string $fieldName, string $alias, ?string $orderBy): string
+    public function groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct = true): string
     {
-        return ", GROUP_CONCAT($fieldName ORDER BY $orderBy SEPARATOR ';') as $alias  ";  
+        $distinctStr = $distinct ? 'DISTINCT ' : '';
+        return ", GROUP_CONCAT({$distinctStr}$fieldName ORDER BY $orderBy SEPARATOR ';') as $alias  ";  
     }
 
     #[\Override]

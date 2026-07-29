@@ -16,9 +16,11 @@ use Rudra\Model\Interfaces\SqlDialectInterface;
 class PgSQL implements SqlDialectInterface
 {
     #[\Override]
-    public function groupConcat(string $fieldName, string $alias, ?string $orderBy): string
+    public function groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct = true): string
     {
-        return ", array_to_string(array_agg($fieldName ORDER BY $orderBy), ';') $alias  ";     
+        $distinctStr = $distinct ? 'DISTINCT ' : '';
+        $orderField  = $distinct ? $fieldName : ($orderBy ?? $fieldName);
+        return ", array_to_string(array_agg({$distinctStr}$fieldName ORDER BY $orderField), ';') $alias";
     }
 
     #[\Override]
