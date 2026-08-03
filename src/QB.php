@@ -67,6 +67,12 @@ class QB
         return $this;
     }
 
+    public function update(string $table, string $set): self
+    {
+        $this->query .= "UPDATE {$table} SET {$set} ";
+        return $this;
+    }
+
     public function groupConcat(string $fieldName, string $alias, ?string $orderBy = null): self
     {
         $this->query .= $this->driver->groupConcat($fieldName, $alias, $orderBy);

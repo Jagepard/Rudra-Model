@@ -18,10 +18,12 @@ trait CrudTrait
     public function getAllPerPage(Pagination $pagination, ?string $fields = null): array
     {
         $fields  = $fields ?? implode(',', $this->getFields());
-        $qString = $this->qb()->select($fields)
+        $qString = $this->qb()
+            ->select($fields)
             ->from($this->table)
             ->orderBy("id DESC")
-            ->limit($pagination->getPerPage())->offset($pagination->getOffset())
+            ->limit($pagination->getPerPage())
+            ->offset($pagination->getOffset())
             ->get();
 
         return $this->qBuilder($qString);
@@ -30,9 +32,9 @@ trait CrudTrait
     public function getAll(string $sort = 'id ASC', ?string $fields = null): array
     {
         $fields  = $fields ?? implode(',', $this->getFields());
-        $table   = $this->table;
-        $qString = $this->qb()->select($fields)
-            ->from($table)
+        $qString = $this->qb()
+            ->select($fields)
+            ->from($this->table)
             ->orderBy($sort)
             ->get();
 
@@ -41,10 +43,13 @@ trait CrudTrait
 
     public function numRows(): int
     {
-        $table = $this->table;
-        $count = $this->connection->query("SELECT COUNT(*) FROM {$table}");
+        $qString = $this->qb()
+            ->select('COUNT(*) as count')
+            ->from($this->table)
+            ->get();
 
-        return (int)$count->fetchColumn();
+        $result = $this->qBuilder($qString);
+        return (int)($result[0]['count'] ?? 0);
     }
 
     /**
@@ -56,17 +61,14 @@ trait CrudTrait
      */
     public function findBy(string $field, mixed $value): array|false
     {
-        $table = $this->table;
-        $stmt  = $this->connection->prepare("
-                SELECT * FROM {$table}
-                WHERE {$field} = :val
-        ");
+        $qString = $this->qb()
+            ->select('*')
+            ->from($this->table)
+            ->where("{$field} = :val")
+            ->get();
 
-        $stmt->execute([
-            ":val" => $value,
-        ]);
-        
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $result = $this->qBuilder($qString, [':val' => $value]);
+        return $result ? $result[0] : false;
     }
 
     public function lastInsertId(): string
@@ -83,7 +85,6 @@ trait CrudTrait
      */
     public function search(string $search, string $column, ?string $fields = null): array
     {
-        $table  = $this->table;
         $fields = $fields ?: implode(',', $this->getFields());
         $driver = $this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
@@ -95,29 +96,27 @@ trait CrudTrait
             default  => "$column",                // fallback (If suddenly another DBMS)
         };
 
-        $query = $this->connection->prepare("
-            SELECT {$fields} FROM {$table}
-            WHERE {$searchExpr} LIKE :search
-            ORDER BY id DESC
-            LIMIT 10
-        ");
+        $qString = $this->qb()
+            ->select($fields)
+            ->from($this->table)
+            ->where("{$searchExpr} LIKE :search")
+            ->orderBy('id DESC')
+            ->limit(10)
+            ->get();
 
-        $query->execute([':search' => "%{$search}%"]);
-        return $query->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->qBuilder($qString, [':search' => "%{$search}%"]);
     }
 
     public function find(int|string $id): array|false
     {
-        $stmt = $this->connection->prepare("
-                SELECT * FROM {$this->table}
-                WHERE id = :id
-        ");
+        $qString = $this->qb()
+            ->select('*')
+            ->from($this->table)
+            ->where('id = :id')
+            ->get();
 
-        $stmt->execute([
-            ':id' => $id,
-        ]);
-
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $result = $this->qBuilder($qString, [':id' => $id]);
+        return $result ? $result[0] : false;
     }
 
     public function update(array $fields): void
@@ -127,32 +126,36 @@ trait CrudTrait
         $stmtString   = $this->updateStmtString($fields);
         $fields['id'] = $id;
 
-        $query = $this->connection->prepare("
-                UPDATE {$this->table} SET {$stmtString}
-                WHERE id =:id");
+        $qString = $this->qb()
+            ->update($this->table, $stmtString)
+            ->where('id = :id')
+            ->get();
 
-        $query->execute($fields);
+        $this->qBuilder($qString, $fields);
         $this->clearCache();
     }
 
     public function create(array $fields): void
     {
-        $table      = $this->table;
         $stmtString = $this->createStmtString($fields);
 
-        $query = $this->connection->prepare("
-                INSERT INTO {$table} ({$stmtString[0]})
-                VALUES ({$stmtString[1]})");
+        $qString = $this->qb()
+            ->insert($this->table, $stmtString[0])
+            ->values($stmtString[1])
+            ->get();
 
-        $query->execute($fields);
+        $this->qBuilder($qString, $fields);
         $this->clearCache();
     }
 
     public function delete(int|string $id): void
     {
-        $table = $this->table;
-        $query = $this->connection->prepare("DELETE FROM {$table} WHERE id = :id");
-        $query->execute([':id' => $id]);
+        $qString = $this->qb()
+            ->delete($this->table)
+            ->where('id = :id')
+            ->get();
+
+        $this->qBuilder($qString, [':id' => $id]);
         $this->clearCache();
     }
 
