@@ -49,6 +49,24 @@ class QB
         return $this;
     }
 
+    public function delete(string $table): self
+    {
+        $this->query .= "DELETE FROM {$table} ";
+        return $this;
+    }
+
+    public function insert(string $table, string $columns): self
+    {
+        $this->query .= "INSERT INTO {$table} ({$columns}) ";
+        return $this;
+    }
+
+    public function values(string $placeholders): self
+    {
+        $this->query .= "VALUES ({$placeholders})";
+        return $this;
+    }
+
     public function groupConcat(string $fieldName, string $alias, ?string $orderBy = null): self
     {
         $this->query .= $this->driver->groupConcat($fieldName, $alias, $orderBy);
