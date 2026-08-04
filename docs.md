@@ -23,7 +23,7 @@
 ### Class: Rudra\Model\Drivers\MySQL
 | Visibility | Function |
 |:-----------|:---------|
-| public | `groupConcat(string $fieldName, string $alias, ?string $orderBy): string`<br> |
+| public | `groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct): string`<br> |
 | public | `close(): string`<br> |
 | public | `integer(string $field, string $default, bool $autoincrement, string $null): string`<br> |
 | public | `string(string $field, string $default, string $null): string`<br> |
@@ -38,7 +38,7 @@
 ### Class: Rudra\Model\Drivers\PgSQL
 | Visibility | Function |
 |:-----------|:---------|
-| public | `groupConcat(string $fieldName, string $alias, ?string $orderBy): string`<br> |
+| public | `groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct): string`<br> |
 | public | `close(): string`<br> |
 | public | `integer(string $field, string $default, bool $autoincrement, string $null): string`<br> |
 | public | `string(string $field, string $default, string $null): string`<br> |
@@ -53,7 +53,7 @@
 ### Class: Rudra\Model\Drivers\SQLite
 | Visibility | Function |
 |:-----------|:---------|
-| public | `groupConcat(string $fieldName, string $alias, ?string $orderBy): string`<br> |
+| public | `groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct): string`<br> |
 | public | `close(): string`<br> |
 | public | `integer(string $field, string $default, bool $autoincrement, string $null): string`<br> |
 | public | `string(string $field, string $default, string $null): string`<br> |
@@ -78,7 +78,7 @@
 ### Class: Rudra\Model\Interfaces\SqlDialectInterface
 | Visibility | Function |
 |:-----------|:---------|
-| abstract public | `groupConcat(string $fieldName, string $alias, ?string $orderBy): string`<br> |
+| abstract public | `groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct): string`<br> |
 | abstract public | `close(): string`<br> |
 | abstract public | `integer(string $field, string $default, bool $autoincrement, string $null): string`<br> |
 | abstract public | `string(string $field, string $default, string $null): string`<br> |
@@ -104,6 +104,10 @@
 |:-----------|:---------|
 | public | `__construct($connection)`<br>Initializes the database driver based on the provided connection or a default connection from the container.<br>If no connection is provided and none is available in the container, a LogicException is thrown.<br>The driver is selected based on the database type specified in the connection's driver attribute. |
 | public | `select(string $fields): self`<br> |
+| public | `delete(string $table): self`<br> |
+| public | `insert(string $table, string $columns): self`<br> |
+| public | `values(string $placeholders): self`<br> |
+| public | `update(string $table, string $set): self`<br> |
 | public | `groupConcat(string $fieldName, string $alias, ?string $orderBy): self`<br> |
 | public | `from(string $table): self`<br> |
 | public | `where(string $param): self`<br> |
@@ -145,7 +149,10 @@
 | public | `connection(): PDO`<br>Returns the current PDO instance used by the repository. |
 | public | `onConnection(PDO $connection): self`<br>Sets the connection for the database connection and resets the Query Builder instance.<br>This method allows changing the connection dynamically and ensures that the Query Builder is re-initialized. |
 | public | `withConnection(PDO $connection): self`<br>Creates and returns a new instance of the class with the specified connection.<br>This method allows changing the connection while preserving the current table name.<br>It is useful for creating new instances with different database connections without modifying the original object. |
-| public | `qBuilder(string $queryString, array $queryParams): array`<br>Executes a custom SQL query and returns the result as an associative array.<br>The method prepares the query, executes it with optional parameters, and fetches all results. |
+| public | `fetchAll(string $queryString, array $queryParams): array`<br>Executes the query and returns all result rows (for SELECT). |
+| public | `fetch(string $queryString, array $queryParams): array\|false`<br>Executes the query and returns a single row. |
+| public | `execute(string $queryString, array $queryParams): bool`<br>Executes the query (INSERT, UPDATE, DELETE) and returns the execution status. |
+| public | `qBuilder(string $queryString, array $queryParams): array`<br> |
 | public | `getAllPerPage(Rudra\Pagination $pagination, ?string $fields): array`<br> |
 | public | `getAll(string $sort, ?string $fields): array`<br> |
 | public | `numRows(): int`<br> |
@@ -169,8 +176,9 @@
 ### Class: Rudra\Model\Schema
 | Visibility | Function |
 |:-----------|:---------|
-| public static | `create(string $table, callable $callback): self`<br>Creates a new Schema instance and defines the table structure using a callback function.<br>The callback function is used to configure the table schema via the Query Builder. |
-| public | `execute(): bool`<br>Executes the schema creation by preparing and running the SQL query.<br>The SQL query is generated using the Query Builder and executed on the database connection. |
+| public static | `create(string $table, callable $callback): self`<br>Creates a new Schema instance and defines the table structure using a callback function. |
+| public static | `hasTable(string $table): bool`<br>Checks if a table exists in the database. |
+| public | `execute(): bool`<br>Executes the schema creation.<br>Throws an exception if the table already exists to prevent silent masking of DB state. |
 
 
 <a id="rudra_model_traits_cachetrait"></a>

@@ -61,19 +61,17 @@ Build queries fluently. The QB simply builds the SQL string, which is then execu
 ```php
 use Rudra\Model\QBFacade as QB;
 
-$query = QB::select('id, name, email')
-    ->from('users')
-    ->where('status = :status')
-    ->and('role = :role')
-    ->orderBy('created_at DESC')
-    ->limit(10)
-    ->get();
+// SELECT multiple rows
+$query = QB::select('*')->from('users')->where('status = :status')->get();
+$users = User::fetchAll($query, ['status' => 'active']);
 
-// Resulting SQL: 
-// SELECT id, name, email FROM users WHERE status = :status AND role = :role ORDER BY created_at DESC LIMIT 10;
+// SELECT single row
+$query = QB::select('*')->from('users')->where('id = :id')->get();
+$user = User::fetch($query, ['id' => 42]); // array|false
 
-// Execute via Repository:
-$results = User::qBuilder($query, ['status' => 'active', 'role' => 'admin']);
+// INSERT/UPDATE/DELETE
+$query = QB::update('users', 'status = :status')->where('id = :id')->get();
+User::execute($query, ['status' => 'banned', 'id' => 42]); // bool
 ```
 ### 4. Creating Tables (Schema)
 Define your database schema using the Query Builder.

@@ -103,6 +103,41 @@ class Repository
     }
 
     /**
+     * Executes the query and returns all result rows (for SELECT).
+     */
+    public function fetchAll(string $queryString, array $queryParams = []): array
+    {
+        $stmt = $this->connection->prepare($queryString);
+        $stmt->execute($queryParams);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Executes the query and returns a single row.
+     */
+    public function fetch(string $queryString, array $queryParams = []): array|false
+    {
+        $stmt = $this->connection->prepare($queryString);
+        $stmt->execute($queryParams);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Executes the query (INSERT, UPDATE, DELETE) and returns the execution status.
+     */
+    public function execute(string $queryString, array $queryParams = []): bool
+    {
+        $stmt = $this->connection->prepare($queryString);
+        return $stmt->execute($queryParams);
+    }
+
+    /**
+     * @deprecated since 2026-08-04 Use QB::fetchAll(), QB::fetch(), or QB::execute() instead.
+     * 
+     * @see QB::fetchAll()
+     * @see QB::fetch()
+     * @see QB::execute()
+     * 
      * Executes a custom SQL query and returns the result as an associative array.
      * The method prepares the query, executes it with optional parameters, and fetches all results.
      */
@@ -110,7 +145,6 @@ class Repository
     {
         $stmt = $this->connection->prepare($queryString);
         $stmt->execute($queryParams);
-
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
