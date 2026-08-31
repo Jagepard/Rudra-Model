@@ -22,7 +22,7 @@ trait CacheTrait
     {
         $directory = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'database';     
         $file      = "$directory/$params[0].json";
-        $cacheTime = $cacheTime ?? config('cache_time', 'database');
+        $cacheTime = $cacheTime ?? config('cache_time.database');
 
         if (!is_dir($directory)) {
             mkdir($directory, 0755, true);
