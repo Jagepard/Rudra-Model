@@ -23,7 +23,7 @@ trait CrudTrait
             $this->qb()
                 ->select($fields)
                 ->from($this->table)
-                ->orderBy("id DESC")
+                ->orderBy('id DESC')
                 ->limit($pagination->getPerPage())
                 ->offset($pagination->getOffset())
                 ->get()
@@ -171,7 +171,7 @@ trait CrudTrait
 
     /**
      * Generates a string of fields and placeholders for an SQL UPDATE statement.
-     * The method takes an array of fields and constructs a comma-separated list of "key=:key" pairs.
+     * The method takes an array of fields and constructs a comma-separated list of 'key=:key' pairs.
      * This string can be directly used in the SET clause of an SQL UPDATE query.
      */
     protected static function updateStmtString(array $fields): string
@@ -182,7 +182,7 @@ trait CrudTrait
             $stmtFields[] = "{$key}=:{$key}";
         }
 
-        return implode(",", $stmtFields);
+        return implode(',', $stmtFields);
     }
 
     /**
@@ -202,6 +202,6 @@ trait CrudTrait
             $execute[] = ":{$key}";
         }
 
-        return [implode(",", $insert), implode(",", $execute)];
+        return [implode(',', $insert), implode(',', $execute)];
     }
 }

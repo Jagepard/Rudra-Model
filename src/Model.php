@@ -36,7 +36,7 @@ class Model
      */
     public function __call(string $method, array $parameters = []): mixed
     {      
-        $className = str_replace("Model", "Repository", get_called_class()) . "Repository";
+        $className = str_replace('Model', 'Repository', get_called_class()) . 'Repository';
 
         // If there is no Repository, then call the parent Repository
         if (!class_exists($className)) {

@@ -36,11 +36,11 @@ class Entity
      */
     protected static function callMethod(string $method, array $parameters): mixed
     {
-        $className = str_replace("Entity", "Model", get_called_class());
+        $className = str_replace('Entity', 'Model', get_called_class());
 
         // If there is no Model, then call the Repository
         if (!class_exists($className)) {
-            $className = str_replace("Entity", "Repository", get_called_class() . "Repository");
+            $className = str_replace('Entity', 'Repository', get_called_class() . 'Repository');
         }
 
         // If there is no Repository, then call the parent Repository

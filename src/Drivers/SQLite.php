@@ -25,7 +25,7 @@ class SQLite implements SqlDialectInterface
     #[\Override]
     public function close(): string
     {
-        return ")";
+        return ')';
     }
 
     #[\Override]
@@ -53,18 +53,18 @@ class SQLite implements SqlDialectInterface
     #[\Override]
     public function createdAt(): string
     {
-        return ", created_at TEXT DEFAULT CURRENT_TIMESTAMP";
+        return ', created_at TEXT DEFAULT CURRENT_TIMESTAMP';
     }
 
     #[\Override]
     public function updatedAt(): string
     {
-        return ", updated_at TEXT DEFAULT CURRENT_TIMESTAMP";
+        return ', updated_at TEXT DEFAULT CURRENT_TIMESTAMP';
     }
 
     #[\Override]
     public function primaryKey(string $field): string
     {
-        return "";
+        return '';
     }
 }

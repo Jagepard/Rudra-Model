@@ -25,11 +25,11 @@ class MySQL implements SqlDialectInterface
     #[\Override]
     public function close(): string
     {
-        return ") ENGINE = InnoDB";
+        return ') ENGINE = InnoDB';
     }
 
     #[\Override]
-    public function integer(string $field, string $default = "", bool $autoincrement = false, string $null = "NOT NULL"): string
+    public function integer(string $field, string $default = '', bool $autoincrement = false, string $null = 'NOT NULL'): string
     {
         if ($autoincrement) {
             return "`$field` INT $null AUTO_INCREMENT $default";
@@ -39,13 +39,13 @@ class MySQL implements SqlDialectInterface
     }
 
     #[\Override]
-    public function string(string $field, string $default = "", string $null = "NOT NULL"): string
+    public function string(string $field, string $default = '', string $null = 'NOT NULL'): string
     {
         return ", `$field` VARCHAR(255) $null $default";
     }
 
     #[\Override]
-    public function text(string $field, string $null = "NOT NULL"): string
+    public function text(string $field, string $null = 'NOT NULL'): string
     {
         return ", `$field` text $null";
     }
@@ -53,13 +53,13 @@ class MySQL implements SqlDialectInterface
     #[\Override]
     public function createdAt(): string
     {
-        return ", `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
+        return ', `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP';
     }
 
     #[\Override]
     public function updatedAt(): string
     {
-        return ", `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
+        return ', `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
     }
 
     public function primaryKey(string $field): string
