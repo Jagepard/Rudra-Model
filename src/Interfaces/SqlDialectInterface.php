@@ -15,9 +15,9 @@ interface SqlDialectInterface
 {
     public function groupConcat(string $fieldName, string $alias, ?string $orderBy, bool $distinct = true): string;
     public function close(): string;
-    public function integer(string $field, string $default = "", bool $autoincrement = false, string $null = "NOT NULL"): string;
-    public function string(string $field, string $default = "", string $null = "NOT NULL"): string;
-    public function text(string $field, string $null = "NOT NULL"): string;
+    public function integer(string $field, string $default = '', bool $autoincrement = false, string $null = 'NOT NULL'): string;
+    public function string(string $field, string $default = '', string $null = 'NOT NULL'): string;
+    public function text(string $field, string $null = 'NOT NULL'): string;
     public function createdAt(): string;
     public function updatedAt(): string;
     public function primaryKey(string $field): string;

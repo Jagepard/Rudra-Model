@@ -37,7 +37,7 @@ class Schema
     public static function hasTable(string $table): bool
     {
         try {
-            Rudra::get("connection")->query("SELECT 1 FROM `$table` LIMIT 1");
+            Rudra::get('connection')->query("SELECT 1 FROM `$table` LIMIT 1");
             return true;
         } catch (\PDOException $e) {
             return false;
@@ -50,7 +50,7 @@ class Schema
      */
     public function execute(): bool
     {
-        $connection = Rudra::get("connection");
+        $connection = Rudra::get('connection');
 
         if (isset($this->table) && self::hasTable($this->table)) {
             throw new \RuntimeException("Table '{$this->table}' already exists in DB");

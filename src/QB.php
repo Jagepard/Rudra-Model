@@ -32,13 +32,13 @@ class QB
      */
     public function __construct($connection = null)
     {
-        $connection = $connection ?? Rudra::get('connection') ?? throw new LogicException("connection is not installed");
+        $connection = $connection ?? Rudra::get('connection') ?? throw new LogicException('connection is not installed');
 
-        if ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+        if ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql') {
             $this->driver = new MySQL;
-        } elseif ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+        } elseif ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
             $this->driver = new PgSQL;
-        } elseif ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+        } elseif ($connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             $this->driver = new SQLite;
         }
     }
@@ -127,7 +127,7 @@ class QB
         return $this;
     }
 
-    public function join(string $param, string $type = "LEFT"): self
+    public function join(string $param, string $type = 'LEFT'): self
     {
         $this->query .= "$type JOIN $param ";
         return $this;
@@ -159,19 +159,19 @@ class QB
         return $this;
     }
 
-    public function integer(string $field, string $default = "", bool $autoincrement = false, string $null = "NOT NULL"): self
+    public function integer(string $field, string $default = '', bool $autoincrement = false, string $null = 'NOT NULL'): self
     {
         $this->query .= $this->driver->integer($field, $default, $autoincrement, $null);
         return $this;
     }
 
-    public function string(string $field, string $default = "", string $null = "NOT NULL"): self
+    public function string(string $field, string $default = '', string $null = 'NOT NULL'): self
     {
         $this->query .= $this->driver->string($field, $default, $null);
         return $this;
     }
 
-    public function text(string $field, string $null = "NOT NULL"): self
+    public function text(string $field, string $null = 'NOT NULL'): self
     {
         $this->query .= $this->driver->text($field, $null);
         return $this;

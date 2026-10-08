@@ -24,14 +24,14 @@ trait SchemaTrait
     {
         $table = $this->table;
 
-        if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+        if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql') {
             $query = $this->connection->query("SHOW COLUMNS FROM {$table}");
-        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
             $query = $this->connection->query("SELECT column_name, data_type
                 FROM information_schema.columns 
                 WHERE table_name = '{$table}'"
             );
-        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'sqlite') {
                 $query = $this->connection->query("PRAGMA table_info('{$table}')"
             );
         }
@@ -54,15 +54,15 @@ trait SchemaTrait
         // Initialize as an empty array — protection against null
         $fieldList = [];
 
-        if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "mysql") {
+        if ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql') {
             foreach ($this->getColumns() as $column) {
                 $fieldList[] = $column['Field'];
             }
-        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "pgsql") {
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
             foreach ($this->getColumns() as $column) {
                 $fieldList[] = $column['column_name'];
             }
-        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === "sqlite") {
+        } elseif ($this->connection->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             foreach ($this->getColumns() as $column) {
                 $fieldList[] = $column['name'];
             }

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * @author  Korotkov Danila (JageDord) <jagepard@yandex.ru>
+ * @author  Korotkov Danila (Jagepard) <jagepard@yandex.ru>
  * @license https://mozilla.org/MPL/2.0/  MPL-2.0
  */
 
@@ -26,7 +26,7 @@ class PgSQL implements SqlDialectInterface
     #[\Override]
     public function close(): string
     {
-        return ");";
+        return ');';
     }
 
     #[\Override]
@@ -54,18 +54,18 @@ class PgSQL implements SqlDialectInterface
     #[\Override]
     public function createdAt(): string
     {
-        return ", created_at TIMESTAMP without time zone";
+        return ', created_at TIMESTAMP without time zone';
     }
 
     #[\Override]
     public function updatedAt(): string
     {
-        return ", updated_at TIMESTAMP without time zone";
+        return ', updated_at TIMESTAMP without time zone';
     }
 
     #[\Override]
     public function primaryKey(string $field): string
     {
-        return "";
+        return '';
     }
 }
